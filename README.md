@@ -35,7 +35,11 @@ A modern web application for tracking personal expenses built with Spring Boot a
 
 ## Getting Started
 
-1. Clone the repository
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/yourusername/expense-tracker-app.git
+   cd expense-tracker-app
+   ```
 2. Run the application:
    ```bash
    mvn spring-boot:run
@@ -54,25 +58,37 @@ CREATE TABLE expenses (
 );
 ```
 
+## Prerequisites
+
+- Java 17 or higher
+- Maven 3.6 or higher
+
 ## Project Structure
 
 ```
-src/
-├── main/
-│   ├── java/com/projects/tracker/
-│   │   ├── controller/ExpenseController.java
-│   │   ├── model/Expense.java
-│   │   └── services/ExpenseService.java
-│   └── resources/
-│       ├── static/
-│       │   ├── css/
-│       │   │   ├── expense-add.css
-│       │   │   └── expense-list.css
-│       │   └── js/
-│       │       └── expense-list.js
-│       └── templates/
-│           ├── expense-add.html
-│           └── expense-list.html
+expense-tracker-app/
+├── src/
+│   ├── main/
+│   │   ├── java/com/projects/tracker/
+│   │   │   ├── TrackerApplication.java
+│   │   │   ├── controller/ExpenseController.java
+│   │   │   ├── model/Expense.java
+│   │   │   ├── repository/ExpenseRepository.java
+│   │   │   └── services/ExpenseService.java
+│   │   └── resources/
+│   │       ├── static/
+│   │       │   ├── css/
+│   │       │   │   ├── expense-add.css
+│   │       │   │   └── expense-list.css
+│   │       │   └── js/
+│   │       │       └── expense-list.js
+│   │       ├── templates/
+│   │       │   ├── expense-add.html
+│   │       │   └── expense-list.html
+│   │       └── application.properties
+│   └── test/
+├── pom.xml
+└── README.md
 ```
 
 ## Usage
