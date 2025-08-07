@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <title>Expense List</title>
+        <link rel="stylesheet" th:href="@{/css/expense-list.css}">
+        <script th:src="@{/js/expense-list.js}" defer></script>
+    </head>
+    <body>
+        <div class="container">
+            <h1>Expense List</h1>
+            <h2>Your recorded expenses</h2>
+            <div class="filter-container">
+                <label for="categoryFilter">Filter by Category:</label>
+                <select id="categoryFilter">
+                    <option value="all">All Categories</option>
+                    <option value="rent">🏠 Rent / Mortgage</option>
+                    <option value="groceries">🍽️ Groceries</option>
+                    <option value="utilities">🔌 Utilities</option>
+                    <option value="transportation">🚗 Transportation</option>
+                    <option value="dining">☕ Dining Out</option>
+                    <option value="entertainment">🎬 Entertainment</option>
+                    <option value="clothing">👕 Clothing</option>
+                    <option value="personalCare">💇 Personal Care</option>
+                    <option value="loanPayments">💳 Loan Payments</option>
+                    <option value="savings">🏦 Savings</option>
+                    <option value="subscriptions">💡 Subscriptions</option>
+                    <option value="gifts">🎁 Gifts & Donations</option>
+                    <option value="other">❓ Other</option>
+                </select>
+            </div>
+            <table>
+            <tr>
+                <th>Category</th>
+                <th>Description</th>
+                <th>Amount</th>
+                <th>Date</th>
+            </tr>
+            <tr th:each="expense : ${expenses}" class="expense-row">
+                <td th:data-category="${expense.category}"></td>
+                <td th:text="${expense.description}" class="description"></td>
+                <td th:text="${#numbers.formatDecimal(expense.amount, 1, 2, 'POINT')}" class="amount"></td>
+                <td th:text="${expense.date}" class="date"></td>
+            </tr>
+            </table>
+            <a href="/expenses/new" class="add-btn">Add New Expense</a>
+        </div>
+    </body>
+</html>
