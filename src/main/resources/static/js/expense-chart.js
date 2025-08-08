@@ -14,7 +14,7 @@ document.addEventListener("DOMContentLoaded", () => {
             datasets: [{
                 label: `Expenses ($) - ${yearFilter.value}`,
                 data: [],
-                backgroundColor: new Array(12).fill('rgba(75, 192, 192, 0.7)'),
+                backgroundColor: new Array(12).fill('rgba(75, 192, 192, 0.8)'),
                 borderWidth: 1
             }]
         },

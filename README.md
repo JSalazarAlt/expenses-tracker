@@ -1,14 +1,24 @@
 # Expense Tracker App
 
-A modern web application for tracking personal expenses built with Spring Boot and Thymeleaf.
+A simple web application for tracking personal expenses, built as a learning project using Spring Boot and Thymeleaf. This application helps users record and organize their daily expenses with basic filtering and visualization features.
+
+## About This Project
+
+This is a beginner-friendly project created to practice web development concepts including:
+- Spring Boot framework basics
+- Database operations with JPA
+- Web forms and data validation
+- Basic chart visualization
+- Responsive web design
 
 ## Features
 
 - ✅ Add new expenses with description, amount, date, and category
-- 📊 View all expenses in a clean, organized table
+- 📊 View all expenses in an organized table
 - 🔍 Filter expenses by category
-- 💰 Professional UI with gradient design
-- 📱 Responsive layout
+- 📈 View yearly expense charts with monthly breakdown
+- 🎨 Clean user interface with gradient styling
+- 📱 Responsive layout for different screen sizes
 
 ## Categories
 
@@ -30,7 +40,7 @@ A modern web application for tracking personal expenses built with Spring Boot a
 
 - **Backend**: Spring Boot, Spring MVC
 - **Frontend**: Thymeleaf, HTML5, CSS3, JavaScript
-- **Database**: H2 (in-memory)
+- **Database**: MySQL
 - **Build Tool**: Maven
 
 ## Getting Started
@@ -40,11 +50,22 @@ A modern web application for tracking personal expenses built with Spring Boot a
    git clone https://github.com/yourusername/expense-tracker-app.git
    cd expense-tracker-app
    ```
-2. Run the application:
+
+2. Set up your MySQL database:
+   - Create a database named `expense_tracker`
+   - Update `application.properties` with your database credentials
+
+3. (Optional) Populate with sample data:
+   ```bash
+   mysql -u your_username -p expense_tracker < sample_data.sql
+   ```
+
+4. Run the application:
    ```bash
    mvn spring-boot:run
    ```
-3. Open your browser and navigate to `http://localhost:8080/expenses`
+
+5. Open your browser and navigate to `http://localhost:8080/expenses`
 
 ## Database Schema
 
@@ -62,6 +83,17 @@ CREATE TABLE expenses (
 
 - Java 17 or higher
 - Maven 3.6 or higher
+- MySQL database server
+
+## Learning Objectives
+
+This project was built to understand:
+- Spring Boot application structure
+- MVC pattern implementation
+- Database integration with Spring Data JPA
+- Thymeleaf templating engine
+- Frontend-backend data flow
+- Chart.js integration for data visualization
 
 ## Project Structure
 
@@ -79,12 +111,15 @@ expense-tracker-app/
 │   │       ├── static/
 │   │       │   ├── css/
 │   │       │   │   ├── expense-add.css
-│   │       │   │   └── expense-list.css
+│   │       │   │   ├── expense-list.css
+│   │       │   │   └── expense-chart.css
 │   │       │   └── js/
-│   │       │       └── expense-list.js
+│   │       │       ├── expense-list.js
+│   │       │       └── expense-chart.js
 │   │       ├── templates/
 │   │       │   ├── expense-add.html
-│   │       │   └── expense-list.html
+│   │       │   ├── expense-list.html
+│   │       │   └── expense-chart.html
 │   │       └── application.properties
 │   └── test/
 ├── pom.xml
@@ -96,3 +131,9 @@ expense-tracker-app/
 1. **Add Expense**: Navigate to `/expenses/new` to add a new expense
 2. **View Expenses**: Visit `/expenses` to see all recorded expenses
 3. **Filter**: Use the category dropdown to filter expenses by type
+4. **View Charts**: Click "View Yearly Chart" to see monthly expense visualization
+5. **Change Year**: Use the year filter on the chart page to view different years
+
+## Current Status
+
+This is a work-in-progress learning project. Features are being added as I learn new concepts and improve my development skills.
