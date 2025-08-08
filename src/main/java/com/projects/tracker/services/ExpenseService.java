@@ -18,10 +18,14 @@ import java.util.List;
 @Service
 public class ExpenseService {
     
+    /**
+     * Repository for expense data access.
+     */
     private final ExpenseRepository expenseRepository;
 
     /**
      * Constructor for dependency injection of ExpenseRepository.
+     * 
      * @param expenseRepository the repository for expense data access
      */
     public ExpenseService(ExpenseRepository expenseRepository) {
@@ -30,6 +34,7 @@ public class ExpenseService {
 
     /**
      * Retrieves all expenses from the database.
+     * 
      * @return List of all expenses, empty list if no expenses exist
      */
     public List<Expense> getAllExpenses() {
@@ -38,6 +43,7 @@ public class ExpenseService {
 
     /**
      * Saves a new expense or updates an existing one.
+     * 
      * @param expense the expense entity to save
      * @throws IllegalArgumentException if expense is null
      */
@@ -50,6 +56,7 @@ public class ExpenseService {
 
     /**
      * Retrieves an expense by its unique identifier.
+     * 
      * @param id the unique identifier of the expense
      * @return the expense if found, null otherwise
      * @throws IllegalArgumentException if id is null
@@ -63,6 +70,7 @@ public class ExpenseService {
 
     /**
      * Deletes an expense by its unique identifier.
+     * 
      * @param id the unique identifier of the expense to delete
      * @throws IllegalArgumentException if id is null
      */
@@ -75,6 +83,7 @@ public class ExpenseService {
 
     /**
      * Retrieves expenses for a specific month.
+     * 
      * @param month the month (1-12) to filter expenses
      * @return List of expenses for the specified month
      * @throws IllegalArgumentException if month is not between 1 and 12
@@ -88,6 +97,7 @@ public class ExpenseService {
 
     /**
      * Calculates the total amount of all expenses.
+     * 
      * @return the sum of all expense amounts, 0.0 if no expenses exist
      */
     public double getTotalExpenses() {

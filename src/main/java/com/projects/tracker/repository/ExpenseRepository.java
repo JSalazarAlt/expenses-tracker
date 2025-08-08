@@ -20,6 +20,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     
     /**
      * Finds all expenses that occurred in a specific month.
+     * 
      * @param month the month number (1-12) to filter expenses
      * @return List of expenses for the specified month
      */

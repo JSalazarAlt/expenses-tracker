@@ -25,10 +25,14 @@ import org.springframework.web.bind.annotation.PostMapping;
 @RequestMapping("/expenses")
 public class ExpenseController {
     
+    /**
+     * Service layer for expense operations.
+     */
     private final ExpenseService expenseService;
 
     /**
      * Constructor for dependency injection of ExpenseService.
+     * 
      * @param expenseService the service layer for expense operations
      */
     public ExpenseController(ExpenseService expenseService) {
@@ -37,6 +41,7 @@ public class ExpenseController {
 
     /**
      * Displays the expense list page with all recorded expenses.
+     * 
      * @param model the Spring MVC model for passing data to the view
      * @return the name of the expense list template
      */
@@ -53,6 +58,7 @@ public class ExpenseController {
 
     /**
      * Displays the add expense form page.
+     * 
      * @param model the Spring MVC model for passing data to the view
      * @return the name of the add expense template
      */
@@ -66,6 +72,7 @@ public class ExpenseController {
 
     /**
      * Processes the add expense form submission.
+     * 
      * @param expense the expense object populated from form data
      * @return redirect to the expense list page after successful creation
      */

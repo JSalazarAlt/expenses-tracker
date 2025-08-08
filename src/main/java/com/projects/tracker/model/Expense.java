@@ -21,32 +21,32 @@ import jakarta.persistence.Table;
 public class Expense {
 
     /**
-     * Unique identifier for the expense record
+     * Unique identifier for the expense record.
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     /**
-     * Brief description of the expense
+     * Brief description of the expense.
      */
     @Column(name = "description")
     private String description;
 
     /**
-     * Monetary amount of the expense
+     * Monetary amount of the expense.
      */
     @Column(name = "amount")
     private double amount;
 
     /**
-     * Date when the expense occurred
+     * Date when the expense occurred.
      */
     @Column(name = "date")
     private String date;
 
     /**
-     * Category classification of the expense
+     * Category classification of the expense.
      */
     @Column(name = "category")
     private String category;
@@ -73,6 +73,7 @@ public class Expense {
 
     /**
      * Gets the unique identifier of the expense.
+     * 
      * @return the expense ID
      */
     public Long getId() {
@@ -82,6 +83,7 @@ public class Expense {
     /**
      * Sets the unique identifier of the expense.
      * Protected to prevent external modification of auto-generated IDs.
+     * 
      * @param id the expense ID
      */
     protected void setId(Long id) {
@@ -90,6 +92,7 @@ public class Expense {
 
     /**
      * Gets the description of the expense.
+     * 
      * @return the expense description
      */
     public String getDescription() {
@@ -98,6 +101,7 @@ public class Expense {
 
     /**
      * Sets the description of the expense.
+     * 
      * @param description the expense description
      */
     public void setDescription(String description) {
@@ -106,6 +110,7 @@ public class Expense {
 
     /**
      * Gets the monetary amount of the expense.
+     * 
      * @return the expense amount
      */
     public double getAmount() {
@@ -114,6 +119,7 @@ public class Expense {
 
     /**
      * Sets the monetary amount of the expense.
+     * 
      * @param amount the expense amount
      */
     public void setAmount(double amount) {
@@ -122,6 +128,7 @@ public class Expense {
 
     /**
      * Gets the date when the expense occurred.
+     * 
      * @return the expense date
      */
     public String getDate() {
@@ -130,6 +137,7 @@ public class Expense {
 
     /**
      * Sets the date when the expense occurred.
+     * 
      * @param date the expense date
      */
     public void setDate(String date) {
@@ -138,6 +146,7 @@ public class Expense {
 
     /**
      * Gets the category classification of the expense.
+     * 
      * @return the expense category
      */
     public String getCategory() {
@@ -146,6 +155,7 @@ public class Expense {
 
     /**
      * Sets the category classification of the expense.
+     * 
      * @param category the expense category
      */
     public void setCategory(String category) {
