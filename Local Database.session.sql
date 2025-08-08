@@ -1,0 +1,2 @@
+ALTER TABLE expenses MODIFY COLUMN date DATE;
+

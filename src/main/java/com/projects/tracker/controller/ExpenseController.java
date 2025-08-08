@@ -1,16 +1,21 @@
 package com.projects.tracker.controller;
 
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import com.projects.tracker.model.Expense;
 import com.projects.tracker.services.ExpenseService;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+
 
 /**
  * Web controller for handling expense-related HTTP requests.
@@ -84,5 +89,42 @@ public class ExpenseController {
         // Redirect to expense list to show the newly added expense
         return "redirect:/expenses";
     }
+
+    /**
+     * Displays the yearly expenses chart page for a specific year.
+     * Retrieves monthly expense totals and prepares data for Chart.js visualization.
+     * 
+     * @param model the Spring MVC model for passing data to the view
+     * @param year the year for which to display expense chart data
+     * @return the name of the expense chart template
+     */
+    @GetMapping("/chart/{year}")
+    public String showYearlyExpensesChart(Model model, @PathVariable("year") int year) {
+        
+        // Get monthly expense totals for the specified year
+        Map<Integer, Double> monthlyTotals = expenseService.getTotalExpensesByMonthAndYear(year);
+        
+        // Convert map values to list for Chart.js compatibility
+        List<Double> monthlyArray = new ArrayList<>(monthlyTotals.values());
+
+        // Add the monthly data array to model for chart rendering
+        model.addAttribute("monthlyArray", monthlyArray);
+
+        return "expense-chart";
+    }
+
+    @GetMapping("/api/{year}")
+    @ResponseBody
+    public List<Double> getMonthlyExpensesJson(@PathVariable int year) {
+        Map<Integer, Double> monthlyTotals = expenseService.getTotalExpensesByMonthAndYear(year);
+
+        List<Double> monthlyArray = new ArrayList<>();
+        for (int month = 1; month <= 12; month++) {
+            monthlyArray.add(monthlyTotals.getOrDefault(month, 0.0));
+        }
+        return monthlyArray;
+    }
+
+    
     
 }

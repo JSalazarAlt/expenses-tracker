@@ -4,7 +4,10 @@ import org.springframework.stereotype.Service;
 
 import com.projects.tracker.model.Expense;
 import com.projects.tracker.repository.ExpenseRepository;
+
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Service layer for managing expense operations.
@@ -88,11 +91,14 @@ public class ExpenseService {
      * @return List of expenses for the specified month
      * @throws IllegalArgumentException if month is not between 1 and 12
      */
-    public List<Expense> getMonthlyExpenses(int month) {
+    public List<Expense> getExpensesByMonthAndYear(int month, int year) {
         if (month < 1 || month > 12) {
             throw new IllegalArgumentException("Month must be between 1 and 12");
         }
-        return expenseRepository.findByMonth(month);
+        if (year < 0) {
+            throw new IllegalArgumentException("Year must be a positive integer");
+        }
+        return expenseRepository.findByMonthAndYear(month, year);
     }
 
     /**
@@ -112,6 +118,37 @@ public class ExpenseService {
         }
         
         return total;
+    }
+
+    /**
+     * Calculates the total amount of expenses for a specific month and year.
+     * 
+     * @param year the year to filter expenses
+     * @return the sum of all expense amounts for the specified month and year, 0.0 if no expenses exist
+     */
+    public Map<Integer, Double> getTotalExpensesByMonthAndYear(int year) {
+        
+        // Initialize map to store total expenses for each month
+        Map<Integer, Double> totalByMonth = new HashMap<>();
+
+        // Iterate through all 12 months of the year
+        for (int month = 1; month <= 12; month++) {
+            // Get all expenses for current month and year
+            List<Expense> expenses = getExpensesByMonthAndYear(month, year);
+            double total = 0.0;
+            
+            // Sum up all expense amounts for this month
+            for (Expense expense : expenses) {
+                if (expense != null) {
+                    total += expense.getAmount();
+                }
+            }
+            
+            // Store the monthly total in the map
+            totalByMonth.put(month, total);
+        }
+
+        return totalByMonth;
     }
 
 }

@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>Monthly Expenses</title>
+        <link rel="stylesheet" href="/css/expense-chart.css">
+        <script src="https://cdn.jsdelivr.net/npm/chart.js" defer></script>
+        <script src="/js/expense-chart.js" defer></script>
+        <script th:inline="javascript">
+            const monthlyData = /*[[${monthlyArray}]]*/ [];
+            const currentYear = /*[[${year}]]*/ 2025;
+        </script>
+    </head>
+    <body>
+        <div class="container">
+            <div class="filter-container">
+                <label for="yearFilter">Filter by Year:</label>
+                <select id="yearFilter">
+                    <option value="2025">2025</option>
+                    <option value="2024">2024</option>
+                    <option value="2023">2023</option>
+                    <option value="2022">2022</option>
+                    <option value="2021">2021</option>
+                </select>
+            </div>
+            <h2>Monthly Expenses 2024</h2>
+            <div class="chart-container">
+                <canvas id="expensesChart"></canvas>
+            </div>
+        </div>
+    </body>
+</html>

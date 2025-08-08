@@ -6,6 +6,7 @@ import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
+import java.time.LocalDate;
 
 /**
  * Entity class representing an expense record in the database.
@@ -43,7 +44,7 @@ public class Expense {
      * Date when the expense occurred.
      */
     @Column(name = "date")
-    private String date;
+    private LocalDate date;
 
     /**
      * Category classification of the expense.
@@ -64,7 +65,7 @@ public class Expense {
      * @param date date when the expense occurred
      * @param category category classification of the expense
      */
-    public Expense(String description, double amount, String date, String category) {
+    public Expense(String description, double amount, LocalDate date, String category) {
         this.description = description;
         this.amount = amount;
         this.date = date;
@@ -131,7 +132,7 @@ public class Expense {
      * 
      * @return the expense date
      */
-    public String getDate() {
+    public LocalDate getDate() {
         return date;
     }
 
@@ -140,7 +141,7 @@ public class Expense {
      * 
      * @param date the expense date
      */
-    public void setDate(String date) {
+    public void setDate(LocalDate date) {
         this.date = date;
     }
 
@@ -161,7 +162,5 @@ public class Expense {
     public void setCategory(String category) {
         this.category = category;
     }
-
-    
     
 }
