@@ -6,7 +6,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const monthLabels = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 
                          'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
 
-    // Create chart instance with empty data to start
+    // Create chart instance with empty data
     const expensesChart = new Chart(ctx, {
         type: 'bar',
         data: {
