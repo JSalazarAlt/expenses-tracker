@@ -15,5 +15,6 @@
             "username": "root",
             "password": "root"
         }
-    ]
+    ],
+    "java.compile.nullAnalysis.mode": "automatic"
 }
