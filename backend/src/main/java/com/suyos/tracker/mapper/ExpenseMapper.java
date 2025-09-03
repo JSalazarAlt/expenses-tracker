@@ -18,7 +18,7 @@ import com.suyos.tracker.model.Expense;
  * 
  * @author Joel Salazar
  * @version 1.0
- * @since 2024-01-01
+ * @since 1.0
  */
 @Mapper(componentModel = MappingConstants.ComponentModel.SPRING)
 public interface ExpenseMapper {

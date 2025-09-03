@@ -2,27 +2,58 @@ import { useState } from 'react';
 import './ExpenseForm.css';
 import { CATEGORIES } from '../constants/categories';
 
+/**
+ * Expense form component for creating and editing expense records.
+ * 
+ * This component provides a reusable form that works for both creating new
+ * expenses and editing existing ones. The form includes validation and
+ * proper currency formatting for the amount field.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Object|null} props.expense - Existing expense data for editing (null for new expense)
+ * @param {Function} props.onSubmit - Callback function called when form is submitted
+ * @param {Function} props.onCancel - Callback function called when form is cancelled
+ * @author Joel Salazar
+ * @since 1.0
+ */
 function ExpenseForm({ expense, onSubmit, onCancel }) {
+    /**
+     * Form state containing all input field values.
+     * Initialized with existing expense data for editing or empty values for new expense.
+     */
     const [formData, setFormData] = useState({
-        expenseDescription: expense?.expenseDescription || '',
-        expenseAmount: expense?.expenseAmount || '',
-        expenseDate: expense?.expenseDate || '',
-        expenseCategory: expense?.expenseCategory || 'FOOD'
+        expenseDescription: expense?.expenseDescription || '', // Description text
+        expenseAmount: expense?.expenseAmount || '', // Monetary amount
+        expenseDate: expense?.expenseDate || '', // Date in YYYY-MM-DD format
+        expenseCategory: expense?.expenseCategory || 'FOOD' // Default to FOOD category
     });
 
 
 
+    /**
+     * Handles input field changes and updates form state.
+     * 
+     * @param {Event} e - Input change event
+     */
     const handleChange = (e) => {
         const { name, value } = e.target;
+        
+        // Update form state with new field value
         setFormData(prev => ({
             ...prev,
             [name]: value
         }));
     };
 
+    /**
+     * Handles form submission.
+     * 
+     * @param {Event} e - Form submit event
+     */
     const handleSubmit = (e) => {
-        e.preventDefault();
-        onSubmit(formData);
+        e.preventDefault(); // Prevent default form submission
+        onSubmit(formData); // Call parent callback with form data
     };
 
     return (
@@ -67,8 +98,8 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
                     name="expenseDate"
                     value={formData.expenseDate}
                     onChange={handleChange}
-                    min="2020-01-01"
-                    max={new Date().toISOString().split('T')[0]}
+                    min="2020-01-01" // Reasonable minimum date for expenses
+                    max={new Date().toISOString().split('T')[0]} // Today's date as maximum
                     required
                 />
             </div>

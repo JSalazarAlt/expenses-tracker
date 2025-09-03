@@ -26,7 +26,7 @@ import lombok.RequiredArgsConstructor;
  * 
  * @author Joel Salazar
  * @version 1.0
- * @since 2024-01-01
+ * @since 1.0
  */
 @Service
 @RequiredArgsConstructor

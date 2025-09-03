@@ -12,10 +12,13 @@ A full-stack expense tracking application built with Spring Boot backend and Rea
 ## Features
 
 - Create, read, update, and delete expenses
-- Expense categorization
+- Expense categorization with 9 predefined categories
+- Server-side pagination for efficient data handling
 - Financial precision with BigDecimal
-- Input validation
+- Input validation and date constraints
 - CORS-enabled API for frontend integration
+- Professional UI with category icons
+- Comprehensive documentation (Javadoc + JSDoc)
 
 ## Prerequisites
 
@@ -101,7 +104,7 @@ Frontend runs on `http://localhost:5173`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/expenses` | Get all expenses |
+| GET | `/api/expenses?page=0&size=10` | Get paginated expenses |
 | POST | `/api/expenses` | Create new expense |
 | GET | `/api/expenses/{id}` | Get expense by ID |
 | PUT | `/api/expenses/{id}` | Update expense |
@@ -110,46 +113,66 @@ Frontend runs on `http://localhost:5173`
 ### Request/Response Format
 
 **Expense DTO:**
+**Paginated Response:**
 ```json
 {
-  "id": 1,
-  "description": "Grocery shopping",
-  "amount": 45.67,
-  "date": "2024-01-15",
-  "category": "FOOD"
+  "content": [
+    {
+      "expenseId": 1,
+      "expenseDescription": "Grocery shopping",
+      "expenseAmount": 45.67,
+      "expenseDate": "2024-01-15",
+      "expenseCategory": "FOOD"
+    }
+  ],
+  "currentPage": 0,
+  "totalPages": 5,
+  "totalElements": 42,
+  "size": 10,
+  "first": true,
+  "last": false
 }
 ```
 
 **Categories:**
 - FOOD
+- HOUSING
 - TRANSPORTATION
-- ENTERTAINMENT
 - UTILITIES
+- ENTERTAINMENT
 - HEALTHCARE
-- OTHER
+- EDUCATION
+- PERSONAL_CARE
+- MISCELLANEOUS
 
 ## Key Technologies
 
 ### Backend
 - Spring Boot 3.5.5
-- Spring Data JPA
+- Spring Data JPA (with pagination support)
 - Spring Validation
 - MapStruct 1.6.3
 - Lombok
 - MySQL Connector
+- Comprehensive Javadoc documentation
 
 ### Frontend
 - React 19
 - Vite 7
 - ESLint
+- JSDoc documentation
+- Professional CSS styling
 
 ## Development Notes
 
 - Minimum expense amount: $0.01
 - Financial amounts use BigDecimal for precision
+- Server-side pagination (default: 10 items per page)
+- Date validation (2020-01-01 to today)
 - CORS configured for React dev server (port 5173)
 - Validation annotations ensure data integrity
 - MapStruct handles entity-DTO mapping
+- Comprehensive code documentation following industry standards
 
 ## Build for Production
 

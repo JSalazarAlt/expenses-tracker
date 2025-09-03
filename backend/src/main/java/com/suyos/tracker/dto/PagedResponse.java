@@ -17,7 +17,7 @@ import lombok.NoArgsConstructor;
  * @param <T> The type of objects contained in the paginated response
  * @author Joel Salazar
  * @version 1.0
- * @since 2024-01-01
+ * @since 1.0
  */
 @Data
 @NoArgsConstructor

@@ -3,31 +3,65 @@ import './ExpenseList.css';
 import { expenseAPI } from '../services/api';
 import { getCategoryIcon } from '../constants/categories';
 
+/**
+ * Expense list component displaying paginated expense data in a table.
+ * 
+ * This component fetches and displays expenses with server-side pagination,
+ * sorting by date (newest first). It includes controls for page size selection
+ * and provides edit/delete actions for each expense.
+ * 
+ * @component
+ * @param {Object} props - Component props
+ * @param {Function} props.onAddExpense - Callback function for adding new expense
+ * @param {Function} props.onEditExpense - Callback function for editing existing expense
+ * @author Joel Salazar
+ * @since 1.0
+ */
 function ExpenseList({ onAddExpense, onEditExpense }) {
+    /** Current page expense data */
     const [data, setData] = useState([]);
+    
+    /** Loading state for API requests */
     const [loading, setLoading] = useState(true);
+    
+    /** Error state for failed API requests */
     const [error, setError] = useState(null);
+    
+    /** Current page number (zero-based) */
     const [currentPage, setCurrentPage] = useState(0);
+    
+    /** Number of items to display per page */
     const [itemsPerPage, setItemsPerPage] = useState(10);
+    
+    /** Total number of pages available */
     const [totalPages, setTotalPages] = useState(0);
+    
+    /** Total number of expense records */
     const [totalElements, setTotalElements] = useState(0);
 
+    /**
+     * Effect hook to fetch expense data when page or size changes.
+     * Automatically refetches data when currentPage or itemsPerPage changes.
+     */
     useEffect(() => {
         const fetchData = async () => {
-            setLoading(true);
+            setLoading(true); // Show loading state
             try {
+                // Fetch paginated data from API
                 const response = await expenseAPI.getPaginated(currentPage, itemsPerPage);
+                
+                // Update state with response data
                 setData(response.content);
                 setTotalPages(response.totalPages);
                 setTotalElements(response.totalElements);
             } catch (err) {
-                setError(err);
+                setError(err); // Store error for display
             } finally {
-                setLoading(false);
+                setLoading(false); // Hide loading state
             }
         };
         fetchData();
-    }, [currentPage, itemsPerPage]);
+    }, [currentPage, itemsPerPage]); // Re-run when pagination changes
 
     if (loading) {
         return <div className="loading">Loading...</div>;
@@ -39,16 +73,23 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
 
 
 
+    /**
+     * Handles expense deletion and refreshes the current page.
+     * 
+     * @param {number} id - The ID of the expense to delete
+     */
     const handleDelete = async (id) => {
         try {
+            // Delete expense via API
             await expenseAPI.delete(id);
-            // Refresh current page data
+            
+            // Refresh current page data to reflect deletion
             const response = await expenseAPI.getPaginated(currentPage, itemsPerPage);
             setData(response.content);
             setTotalPages(response.totalPages);
             setTotalElements(response.totalElements);
         } catch (err) {
-            setError(err);
+            setError(err); // Handle deletion errors
         }
     };
 
@@ -69,8 +110,8 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                 <label>
                     Show: 
                     <select value={itemsPerPage} onChange={(e) => {
-                        setItemsPerPage(Number(e.target.value));
-                        setCurrentPage(0);
+                        setItemsPerPage(Number(e.target.value)); // Update page size
+                        setCurrentPage(0); // Reset to first page
                     }}>
                         <option value={10}>10 per page</option>
                         <option value={25}>25 per page</option>
@@ -106,15 +147,15 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
 
             <div className="pagination">
                 <button 
-                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 0))}
-                    disabled={currentPage === 0}
+                    onClick={() => setCurrentPage(prev => Math.max(prev - 1, 0))} // Go to previous page
+                    disabled={currentPage === 0} // Disable on first page
                 >
                     Previous
                 </button>
                 <span>Page {currentPage + 1} of {totalPages} ({totalElements} total)</span>
                 <button 
-                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))}
-                    disabled={currentPage >= totalPages - 1}
+                    onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages - 1))} // Go to next page
+                    disabled={currentPage >= totalPages - 1} // Disable on last page
                 >
                     Next
                 </button>
