@@ -11,24 +11,62 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+/**
+ * Data Transfer Object for expense information.
+ * 
+ * This DTO is used to transfer expense data between the API layer and clients.
+ * It provides a clean interface that decouples the internal entity structure
+ * from the external API contract. JSON property annotations ensure consistent
+ * field naming in API responses.
+ * 
+ * @author Joel Salazar
+ * @version 1.0
+ * @since 2024-01-01
+ */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
 public class ExpenseDTO {
     
+    /**
+     * Unique identifier for the expense.
+     * 
+     * Null for new expenses being created, populated for existing expenses.
+     */
     @JsonProperty("expenseId")
     private Long expenseId;
 
+    /**
+     * Description of what the expense was for.
+     * 
+     * Should be descriptive enough to identify the expense later.
+     */
     @JsonProperty("expenseDescription")
     private String expenseDescription;
 
+    /**
+     * Monetary amount of the expense.
+     * 
+     * Uses BigDecimal to maintain precision for financial calculations
+     * and avoid floating-point rounding errors.
+     */
     @JsonProperty("expenseAmount")
     private BigDecimal expenseAmount;
 
+    /**
+     * Date when the expense occurred.
+     * 
+     * Represents the actual date of the expense, not when it was recorded.
+     */
     @JsonProperty("expenseDate")
     private LocalDate expenseDate;
 
+    /**
+     * Category classification for the expense.
+     * 
+     * Used for organizing and filtering expenses by type.
+     */
     @JsonProperty("expenseCategory")
     private Category expenseCategory;
 

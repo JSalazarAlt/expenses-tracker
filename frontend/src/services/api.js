@@ -3,6 +3,9 @@ const API_BASE_URL = 'http://localhost:8080/api';
 export const expenseAPI = {
     getAll: () => fetch(`${API_BASE_URL}/expenses`).then(res => res.json()),
     
+    getPaginated: (page = 0, size = 10) => 
+        fetch(`${API_BASE_URL}/expenses?page=${page}&size=${size}`).then(res => res.json()),
+    
     create: (expense) => 
         fetch(`${API_BASE_URL}/expenses`, {
             method: 'POST',
