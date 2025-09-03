@@ -45,18 +45,8 @@ expense-tracker-app/
 └── frontend/         # React application
     ├── src/
     │   ├── components/        # React components
-    │   │   ├── ExpenseList.jsx
-    │   │   ├── ExpenseList.css
-    │   │   ├── ExpenseForm.jsx
-    │   │   └── ExpenseForm.css
     │   ├── services/          # API service layer
-    │   │   └── api.js
-    │   ├── constants/         # Application constants
-    │   │   └── categories.js
-    │   ├── App.jsx           # Main application component
-    │   ├── App.css
-    │   ├── index.css
-    │   └── main.jsx          # Application entry point
+    │   └── constants/         # Application constants
     ├── public/
     └── package.json
 ```
