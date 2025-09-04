@@ -1,7 +1,9 @@
 import { useEffect, useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import './ExpenseList.css';
 import { expenseAPI } from '../services/api';
-import { getCategoryIcon } from '../constants/categories';
+import { getCategoryIcon, CATEGORIES } from '../constants/categories';
 
 /**
  * Expense list component displaying paginated expense data in a table.
@@ -38,17 +40,34 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
     
     /** Total number of expense records */
     const [totalElements, setTotalElements] = useState(0);
+    
+    /** Filter by category */
+    const [filterCategory, setFilterCategory] = useState('');
+    
+    /** Filter by start date */
+    const [filterStartDate, setFilterStartDate] = useState(null);
+    
+    /** Filter by end date */
+    const [filterEndDate, setFilterEndDate] = useState(null);
 
     /**
-     * Effect hook to fetch expense data when page or size changes.
-     * Automatically refetches data when currentPage or itemsPerPage changes.
+     * Effect hook to fetch expense data when pagination or filters change.
+     * Automatically refetches data when currentPage, itemsPerPage, or any filter changes.
      */
     useEffect(() => {
         const fetchData = async () => {
             setLoading(true); // Show loading state
             try {
-                // Fetch paginated data from API
-                const response = await expenseAPI.getPaginated(currentPage, itemsPerPage);
+                // Fetch paginated data from API with filters
+                const response = await expenseAPI.getPaginated(
+                    currentPage, 
+                    itemsPerPage, 
+                    "expenseDate", 
+                    "desc", 
+                    filterCategory || null, 
+                    filterStartDate ? filterStartDate.toISOString().split('T')[0] : null, 
+                    filterEndDate ? filterEndDate.toISOString().split('T')[0] : null
+                );
                 
                 // Update state with response data
                 setData(response.content);
@@ -61,7 +80,7 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
             }
         };
         fetchData();
-    }, [currentPage, itemsPerPage]); // Re-run when pagination changes
+    }, [currentPage, itemsPerPage, filterCategory, filterStartDate, filterEndDate]); // Re-run when pagination or filters change
 
     if (loading) {
         return <div className="loading">Loading...</div>;
@@ -84,7 +103,15 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
             await expenseAPI.delete(id);
             
             // Refresh current page data to reflect deletion
-            const response = await expenseAPI.getPaginated(currentPage, itemsPerPage);
+            const response = await expenseAPI.getPaginated(
+                currentPage, 
+                itemsPerPage, 
+                "expenseDate", 
+                "desc", 
+                filterCategory || null, 
+                filterStartDate ? filterStartDate.toISOString().split('T')[0] : null, 
+                filterEndDate ? filterEndDate.toISOString().split('T')[0] : null
+            );
             setData(response.content);
             setTotalPages(response.totalPages);
             setTotalElements(response.totalElements);
@@ -117,6 +144,75 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                         <option value={25}>25 per page</option>
                     </select>
                 </label>
+                
+                <label>
+                    Category:
+                    <select value={filterCategory} onChange={(e) => {
+                        setFilterCategory(e.target.value);
+                        setCurrentPage(0); // Reset to first page
+                    }}>
+                        <option value="">All Categories</option>
+                        {CATEGORIES.map(category => (
+                            <option key={category.value} value={category.value}>
+                                {category.icon} {category.label}
+                            </option>
+                        ))}
+                    </select>
+                </label>
+                
+                <label>
+                    Start Date:
+                    <DatePicker
+                        selected={filterStartDate}
+                        onChange={(date) => {
+                            setFilterStartDate(date);
+                            if (date && filterEndDate && date > filterEndDate) {
+                                setFilterEndDate(date);
+                            }
+                            setCurrentPage(0);
+                        }}
+                        dateFormat="MMM dd, yyyy"
+                        placeholderText="Select start date"
+                        maxDate={new Date()}
+                        showPopperArrow={false}
+                        className="filter-date-picker"
+                        calendarClassName="custom-calendar"
+                        isClearable
+                    />
+                </label>
+                
+                <label>
+                    End Date:
+                    <DatePicker
+                        selected={filterEndDate}
+                        onChange={(date) => {
+                            setFilterEndDate(date);
+                            if (date && filterStartDate && date < filterStartDate) {
+                                setFilterStartDate(date);
+                            }
+                            setCurrentPage(0);
+                        }}
+                        dateFormat="MMM dd, yyyy"
+                        placeholderText="Select end date"
+                        maxDate={new Date()}
+                        showPopperArrow={false}
+                        className="filter-date-picker"
+                        calendarClassName="custom-calendar"
+                        isClearable
+                    />
+                </label>
+                
+                <button 
+                    className="btn-clear-filters" 
+                    onClick={() => {
+                        setFilterCategory('');
+                        setFilterStartDate(null);
+                        setFilterEndDate(null);
+                        setCurrentPage(0);
+                    }}
+                >
+                    Clear Filters
+                </button>
             </div>
 
             <table className="expense-table">
@@ -137,8 +233,8 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                             <td className="amount">${parseFloat(expense.expenseAmount).toFixed(2)}</td>
                             <td className="date">{expense.expenseDate}</td>
                             <td className="actions">
-                                <button className="btn-edit" onClick={() => onEditExpense(expense)}>Edit</button>
-                                <button className="btn-delete" onClick={() => handleDelete(expense.expenseId)}>Delete</button>
+                                <button className="btn-edit" onClick={() => onEditExpense(expense)}>✏️ Edit</button>
+                                <button className="btn-delete" onClick={() => handleDelete(expense.expenseId)}>🗑️ Delete</button>
                             </td>
                         </tr>
                     ))}

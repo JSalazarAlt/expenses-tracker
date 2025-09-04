@@ -1,5 +1,6 @@
 package com.suyos.tracker.service;
 
+import java.time.LocalDate;
 import java.util.List;
 
 import org.springframework.data.domain.Page;
@@ -11,6 +12,7 @@ import org.springframework.stereotype.Service;
 import com.suyos.tracker.dto.ExpenseDTO;
 import com.suyos.tracker.dto.PagedResponse;
 import com.suyos.tracker.mapper.ExpenseMapper;
+import com.suyos.tracker.model.Category;
 import com.suyos.tracker.model.Expense;
 import com.suyos.tracker.repository.ExpenseRepository;
 
@@ -39,49 +41,55 @@ public class ExpenseService {
     private final ExpenseMapper expenseMapper;
     
     /**
-     * Retrieves all expenses without pagination.
-     * 
-     * This method fetches all expense records from the database and converts
-     * them to DTOs. Use with caution for large datasets as it loads all data
-     * into memory. Consider using the paginated version for better performance.
-     * 
-     * @return List of all expenses as DTOs
-     */
-    public List<ExpenseDTO> getAllExpenses() {
-        // Fetch all expenses from database
-        List<Expense> expenses = expenseRepository.findAll();
-        
-        // Convert entities to DTOs using mapper
-        return expenses.stream()
-            .map(expenseMapper::toDTO)
-            .toList();
-    }
-    
-    /**
-     * Retrieves expenses with pagination and sorting.
+     * Retrieves expenses with pagination, sorting, and optional filtering.
      * 
      * This method provides efficient data access for large datasets by implementing
-     * server-side pagination. Results are sorted by expense date in descending order
-     * (most recent first) to show the latest expenses at the top.
+     * server-side pagination with optional filters for category and date range.
+     * Results are sorted by the specified field and direction.
      * 
      * @param page Zero-based page index
      * @param size Number of records per page
+     * @param sortBy Field name to sort by
+     * @param sortDir Sort direction ("asc" or "desc")
+     * @param category Optional category filter (null for no filter)
+     * @param startDate Optional start date filter (null for no filter)
+     * @param endDate Optional end date filter (null for no filter)
      * @return PagedResponse containing expense DTOs and pagination metadata
      */
-    public PagedResponse<ExpenseDTO> getExpensesPaginated(int page, int size) {
-        // Create pageable request with sorting by date descending
-        Pageable pageable = PageRequest.of(page, size, Sort.by("expenseDate").descending());
+    public PagedResponse<ExpenseDTO> getExpensesPaginated(int page, int size, String sortBy, String sortDir,
+        Category category, LocalDate startDate, LocalDate endDate) {
+        // Create pageable request with dynamic sorting
+        Sort sort = Sort.by(sortBy);
+        if ("desc".equalsIgnoreCase(sortDir)) {
+            sort = sort.descending();
+        }
+        Pageable pageable = PageRequest.of(page, size, sort);
+
+        // Apply conditional filtering based on provided parameters
+        Page<Expense> expensePage;
         
-        // Fetch paginated data from repository
-        Page<Expense> expensePage = expenseRepository.findAll(pageable);
+        if (category != null && startDate != null && endDate != null) {
+            // Filter by both category and date range
+            expensePage = expenseRepository.findByExpenseCategoryAndExpenseDateBetween(
+                category, startDate, endDate, pageable);
+        } else if (category != null) {
+            // Filter by category only
+            expensePage = expenseRepository.findByExpenseCategory(category, pageable);
+        } else if (startDate != null && endDate != null) {
+            // Filter by date range only
+            expensePage = expenseRepository.findByExpenseDateBetween(startDate, endDate, pageable);
+        } else {
+            // No filters applied - return all expenses
+            expensePage = expenseRepository.findAll(pageable);
+        }
         
-        // Convert page content to DTOs
+        // Convert entities to DTOs for API response
         List<ExpenseDTO> expenses = expensePage.getContent()
             .stream()
             .map(expenseMapper::toDTO)
             .toList();
         
-        // Build response with pagination metadata
+        // Build paginated response with metadata
         return PagedResponse.<ExpenseDTO>builder()
             .content(expenses)
             .currentPage(expensePage.getNumber())
@@ -124,10 +132,10 @@ public class ExpenseService {
         Expense expense = expenseMapper.toEntity(expenseDTO);
         
         // Save entity to database (ID and timestamps auto-generated)
-        Expense saved = expenseRepository.save(expense);
+        Expense savedExpense = expenseRepository.save(expense);
         
         // Return saved entity as DTO with generated ID
-        return expenseMapper.toDTO(saved);
+        return expenseMapper.toDTO(savedExpense);
     }
     
     /**
@@ -154,10 +162,10 @@ public class ExpenseService {
         existingExpense.setExpenseCategory(expenseDTO.getExpenseCategory());
         
         // Save updated entity (updatedAt timestamp automatically set)
-        Expense updated = expenseRepository.save(existingExpense);
+        Expense updatedExpense = expenseRepository.save(existingExpense);
         
         // Return updated entity as DTO
-        return expenseMapper.toDTO(updated);
+        return expenseMapper.toDTO(updatedExpense);
     }
 
     /**
@@ -170,13 +178,10 @@ public class ExpenseService {
      * @throws RuntimeException if no expense exists with the given ID
      */
     public void deleteExpense(Long id) {
-        // Validate expense exists before deletion
-        if (!expenseRepository.existsById(id)) {
-            throw new RuntimeException("Expense not found with id: " + id);
-        }
-        
-        // Perform deletion
-        expenseRepository.deleteById(id);
-    }
+        Expense expense = expenseRepository.findById(id)
+            .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
+        expenseRepository.delete(expense);
+}
+
 
 }

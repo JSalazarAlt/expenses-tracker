@@ -38,9 +38,9 @@ public class ExpenseDTO {
     private Long expenseId;
 
     /**
-     * Description of what the expense was for.
+     * Descriptive text explaining what the expense was for.
      * 
-     * Should be descriptive enough to identify the expense later.
+     * Examples: "Grocery shopping", "Gas for car", "Monthly rent"
      */
     @JsonProperty("expenseDescription")
     private String expenseDescription;

@@ -1,3 +1,5 @@
+import axios from 'axios';
+
 /**
  * Base URL for the expense tracker API endpoints.
  * Points to the Spring Boot backend server.
@@ -8,12 +10,20 @@
  */
 const API_BASE_URL = 'http://localhost:8080/api';
 
+// Create axios instance with base configuration
+const apiClient = axios.create({
+    baseURL: API_BASE_URL,
+    headers: {
+        'Content-Type': 'application/json'
+    }
+});
+
 /**
  * API service object containing all expense-related HTTP operations.
  * 
  * This service provides a centralized interface for communicating with
  * the backend REST API. All methods return Promises that resolve to
- * the parsed JSON response data.
+ * the response data.
  * 
  * @namespace expenseAPI
  * @author Joel Salazar
@@ -21,26 +31,30 @@ const API_BASE_URL = 'http://localhost:8080/api';
  */
 export const expenseAPI = {
     /**
-     * Retrieves all expenses without pagination.
-     * 
-     * @function getAll
-     * @returns {Promise<Array>} Promise resolving to array of expense objects
-     * @since 1.0
-     */
-    getAll: () => fetch(`${API_BASE_URL}/expenses`).then(res => res.json()),
-    
-    /**
      * Retrieves expenses with server-side pagination.
      * 
      * @function getPaginated
      * @param {number} [page=0] - Zero-based page number
      * @param {number} [size=10] - Number of records per page
+     * @param {string} [sortBy="expenseDate"] - Sort field
+     * @param {string} [sortDir="desc"] - Sort direction (asc/desc)
+     * @param {string} [category=null] - Optional category filter
+     * @param {string} [startDate=null] - Optional start date filter (YYYY-MM-DD)
+     * @param {string} [endDate=null] - Optional end date filter (YYYY-MM-DD)
      * @returns {Promise<Object>} Promise resolving to paginated response with content and metadata
      * @since 1.0
      */
-    getPaginated: (page = 0, size = 10) => 
-        fetch(`${API_BASE_URL}/expenses?page=${page}&size=${size}`).then(res => res.json()),
-    
+    getPaginated: async (page = 0, size = 10, sortBy = "expenseDate", sortDir = "desc", 
+        category = null, startDate = null, endDate = null) => {
+        const params = { page, size, sortBy, sortDir };
+        if (category) params.category = category;
+        if (startDate) params.startDate = startDate;
+        if (endDate) params.endDate = endDate;
+        
+        const response = await apiClient.get('/expenses', { params });
+        return response.data;
+    },
+
     /**
      * Creates a new expense record.
      * 
@@ -53,12 +67,10 @@ export const expenseAPI = {
      * @returns {Promise<Object>} Promise resolving to created expense with generated ID
      * @since 1.0
      */
-    create: (expense) => 
-        fetch(`${API_BASE_URL}/expenses`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(expense) // Convert JS object to JSON string
-        }).then(res => res.json()),
+    create: async (expense) => {
+        const response = await apiClient.post('/expenses', expense);
+        return response.data;
+    },
     
     /**
      * Updates an existing expense record.
@@ -70,22 +82,21 @@ export const expenseAPI = {
      * @throws {Error} If expense with given ID doesn't exist
      * @since 1.0
      */
-    update: (id, expense) =>
-        fetch(`${API_BASE_URL}/expenses/${id}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(expense) // Convert updated data to JSON
-        }).then(res => res.json()),
+    update: async (id, expense) => {
+        const response = await apiClient.put(`/expenses/${id}`, expense);
+        return response.data;
+    },
     
     /**
      * Deletes an expense record by ID.
      * 
      * @function delete
      * @param {number} id - Unique identifier of the expense to delete
-     * @returns {Promise<Response>} Promise resolving to fetch Response object
+     * @returns {Promise<void>} Promise that resolves when deletion is complete
      * @throws {Error} If expense with given ID doesn't exist
      * @since 1.0
      */
-    delete: (id) =>
-        fetch(`${API_BASE_URL}/expenses/${id}`, { method: 'DELETE' }) // No body needed for DELETE
+    delete: async (id) => {
+        await apiClient.delete(`/expenses/${id}`);
+    }
 };

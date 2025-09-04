@@ -1,4 +1,6 @@
 import { useState } from 'react';
+import DatePicker from 'react-datepicker';
+import 'react-datepicker/dist/react-datepicker.css';
 import './ExpenseForm.css';
 import { CATEGORIES } from '../constants/categories';
 
@@ -25,7 +27,7 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
     const [formData, setFormData] = useState({
         expenseDescription: expense?.expenseDescription || '', // Description text
         expenseAmount: expense?.expenseAmount || '', // Monetary amount
-        expenseDate: expense?.expenseDate || '', // Date in YYYY-MM-DD format
+        expenseDate: expense?.expenseDate ? new Date(expense.expenseDate + 'T00:00:00') : new Date(), // Date object
         expenseCategory: expense?.expenseCategory || 'FOOD' // Default to FOOD category
     });
 
@@ -47,13 +49,32 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
     };
 
     /**
+     * Handles date picker changes.
+     * 
+     * @param {Date} date - Selected date
+     */
+    const handleDateChange = (date) => {
+        setFormData(prev => ({
+            ...prev,
+            expenseDate: date
+        }));
+    };
+
+    /**
      * Handles form submission.
      * 
      * @param {Event} e - Form submit event
      */
     const handleSubmit = (e) => {
         e.preventDefault(); // Prevent default form submission
-        onSubmit(formData); // Call parent callback with form data
+        
+        // Convert date to YYYY-MM-DD format for backend
+        const submitData = {
+            ...formData,
+            expenseDate: formData.expenseDate.toISOString().split('T')[0]
+        };
+        
+        onSubmit(submitData); // Call parent callback with form data
     };
 
     return (
@@ -92,14 +113,15 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
 
             <div className="form-group">
                 <label htmlFor="expenseDate">Date:</label>
-                <input
-                    type="date"
-                    id="expenseDate"
-                    name="expenseDate"
-                    value={formData.expenseDate}
-                    onChange={handleChange}
-                    min="2020-01-01" // Reasonable minimum date for expenses
-                    max={new Date().toISOString().split('T')[0]} // Today's date as maximum
+                <DatePicker
+                    selected={formData.expenseDate}
+                    onChange={handleDateChange}
+                    dateFormat="MMM dd, yyyy"
+                    maxDate={new Date()}
+                    minDate={new Date('2020-01-01')}
+                    showPopperArrow={false}
+                    className="date-picker-input"
+                    calendarClassName="custom-calendar"
                     required
                 />
             </div>

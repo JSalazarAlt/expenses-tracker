@@ -26,7 +26,7 @@ import lombok.NoArgsConstructor;
 public class PagedResponse<T> {
     
     /**
-     * The actual data content for the current page.
+     * Actual data content for the current page.
      */
     private List<T> content;
     

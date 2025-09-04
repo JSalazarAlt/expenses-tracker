@@ -1,5 +1,7 @@
 package com.suyos.tracker.controller;
 
+import java.time.LocalDate;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.CrossOrigin;
@@ -15,6 +17,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.suyos.tracker.dto.ExpenseDTO;
 import com.suyos.tracker.dto.PagedResponse;
+import com.suyos.tracker.model.Category;
 import com.suyos.tracker.service.ExpenseService;
 
 import jakarta.validation.Valid;
@@ -44,22 +47,33 @@ public class ExpenseController {
     private final ExpenseService expenseService;
     
     /**
-     * Retrieves expenses with pagination support.
+     * Retrieves expenses with pagination, sorting, and filtering support.
      * 
      * This endpoint supports server-side pagination to efficiently handle large datasets.
-     * Results are sorted by expense date in descending order (most recent first).
+     * Results can be filtered by category and date range, and sorted by any field.
      * 
      * @param page Zero-based page number (default: 0)
      * @param size Number of records per page (default: 10)
+     * @param sortBy Field name to sort by (default: "expenseDate")
+     * @param sortDir Sort direction - "asc" or "desc" (default: "desc")
+     * @param category Optional category filter (null for no filter)
+     * @param startDate Optional start date filter (null for no filter)
+     * @param endDate Optional end date filter (null for no filter)
      * @return ResponseEntity containing paginated expense data and metadata
      */
     @GetMapping
     public ResponseEntity<PagedResponse<ExpenseDTO>> getAllExpenses(
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "10") int size,
+            @RequestParam(defaultValue = "expenseDate") String sortBy,
+            @RequestParam(defaultValue = "desc") String sortDir,
+            @RequestParam(required = false) Category category,
+            @RequestParam(required = false) LocalDate startDate,
+            @RequestParam(required = false) LocalDate endDate) {
         
         // Fetch paginated expenses from service layer
-        PagedResponse<ExpenseDTO> expenses = expenseService.getExpensesPaginated(page, size);
+        PagedResponse<ExpenseDTO> expenses = expenseService.getExpensesPaginated(page, size, sortBy, sortDir,
+            category, startDate, endDate);
         
         // Return successful response with data
         return ResponseEntity.ok(expenses);
@@ -71,16 +85,16 @@ public class ExpenseController {
      * The request body is validated using Bean Validation annotations.
      * Returns HTTP 201 (Created) status on successful creation.
      * 
-     * @param dto The expense data to create (validated)
+     * @param expenseDTO The expense data to create (validated)
      * @return ResponseEntity containing the created expense with generated ID
      */
     @PostMapping
-    public ResponseEntity<ExpenseDTO> createExpense(@Valid @RequestBody ExpenseDTO dto) {
+    public ResponseEntity<ExpenseDTO> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO) {
         // Create new expense through service layer
-        ExpenseDTO created = expenseService.createExpense(dto);
+        ExpenseDTO expenseDTOCreated = expenseService.createExpense(expenseDTO);
         
         // Return 201 Created status with the new expense data
-        return ResponseEntity.status(HttpStatus.CREATED).body(created);
+        return ResponseEntity.status(HttpStatus.CREATED).body(expenseDTOCreated);
     }
     
     /**
@@ -95,8 +109,8 @@ public class ExpenseController {
     public ResponseEntity<ExpenseDTO> getExpense(@PathVariable Long id) {
         try {
             // Attempt to retrieve expense by ID
-            ExpenseDTO expense = expenseService.getExpenseById(id);
-            return ResponseEntity.ok(expense);
+            ExpenseDTO expenseDTO = expenseService.getExpenseById(id);
+            return ResponseEntity.ok(expenseDTO);
         } catch (RuntimeException e) {
             // Return 404 if expense not found
             return ResponseEntity.notFound().build();
@@ -110,14 +124,14 @@ public class ExpenseController {
      * Returns HTTP 404 (Not Found) if no expense exists with the given ID.
      * 
      * @param id The ID of the expense to update
-     * @param dto The updated expense data (validated)
+     * @param expenseDTO The updated expense data (validated)
      * @return ResponseEntity containing the updated expense or 404 if not found
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseDTO dto) {
+    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseDTO expenseDTO) {
         try {
             // Attempt to update expense
-            ExpenseDTO updated = expenseService.updateExpense(id, dto);
+            ExpenseDTO updated = expenseService.updateExpense(id, expenseDTO);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             // Return 404 if expense not found

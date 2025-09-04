@@ -27,8 +27,7 @@ import lombok.NoArgsConstructor;
  * Entity representing an expense record in the expense tracking system.
  * 
  * This class maps to the 'expenses' table in the database and contains
- * all the necessary fields to track individual expense transactions
- * including amount, date, category, and description.
+ * all the necessary fields to track individual expense transactions.
  * 
  * @author Joel Salazar
  * @version 1.0
@@ -70,7 +69,7 @@ public class Expense {
      */
     @NotNull(message = "Amount is mandatory")
     @DecimalMin(value = "0.01", inclusive = true, message = "Amount must be at least $0.01")
-    @Digits(integer = 15, fraction = 2, message = "Amount must have a maximum of 15 integer digits and 2 decimal places")
+    @Digits(integer = 7, fraction = 2, message = "Amount must have a maximum of 7 integer digits and 2 decimal places")
     @Column(name = "expense_amount", nullable = false, precision = 17, scale = 2)
     private BigDecimal expenseAmount;
 
