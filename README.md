@@ -11,14 +11,29 @@ A full-stack expense tracking application built with Spring Boot backend and Rea
 
 ## Features
 
+### Core Functionality
 - Create, read, update, and delete expenses
 - Expense categorization with 9 predefined categories
-- Server-side pagination for efficient data handling
+- Server-side pagination with filtering and sorting
+- Advanced filtering by category and date range
 - Financial precision with BigDecimal
 - Input validation and date constraints
 - CORS-enabled API for frontend integration
-- Professional UI with category icons
+
+### User Experience
+- **Modern Design System** - Professional UI with consistent styling
+- **Responsive Design** - Optimized for desktop, tablet, and mobile
+- **Interactive Elements** - Smooth animations and hover effects
+- **Enhanced Date Picker** - Custom React DatePicker with timezone handling
+- **Category Icons** - Visual category identification with emojis
+- **Smart Filtering** - Auto-adjusting date ranges and real-time filtering
+- **Professional Styling** - Gradient backgrounds, shadows, and modern typography
+
+### Technical Excellence
 - Comprehensive documentation (Javadoc + JSDoc)
+- Clean architecture with separation of concerns
+- Type-safe API communication with Axios
+- Performance optimizations and error handling
 
 ## Prerequisites
 
@@ -107,11 +122,21 @@ Frontend runs on `http://localhost:5173`
 
 | Method | Endpoint | Description |
 |--------|----------|-------------|
-| GET | `/api/expenses?page=0&size=10` | Get paginated expenses |
+| GET | `/api/expenses?page=0&size=10&sortBy=expenseDate&sortDir=desc&category=FOOD&startDate=2024-01-01&endDate=2024-12-31` | Get paginated expenses with filtering |
 | POST | `/api/expenses` | Create new expense |
 | GET | `/api/expenses/{id}` | Get expense by ID |
 | PUT | `/api/expenses/{id}` | Update expense |
 | DELETE | `/api/expenses/{id}` | Delete expense |
+
+### Query Parameters
+
+- `page` - Zero-based page number (default: 0)
+- `size` - Number of records per page (default: 10, max: 100)
+- `sortBy` - Sort field: expenseDate, expenseAmount, expenseDescription (default: expenseDate)
+- `sortDir` - Sort direction: asc, desc (default: desc)
+- `category` - Filter by category (optional)
+- `startDate` - Filter by start date in YYYY-MM-DD format (optional)
+- `endDate` - Filter by end date in YYYY-MM-DD format (optional)
 
 ### Request/Response Format
 
@@ -160,14 +185,23 @@ Frontend runs on `http://localhost:5173`
 - Comprehensive Javadoc documentation
 
 ### Frontend
-- React 19
-- Vite 7
-- ESLint
+- React 19 with modern hooks (useState, useReducer, useCallback)
+- Vite 7 for fast development and building
+- React DatePicker for enhanced date selection
+- Axios for HTTP client with error handling
+- ESLint for code quality
 - JSDoc documentation
-- Professional CSS styling
+- **Modern CSS Design System**:
+  - CSS Custom Properties for consistent theming
+  - Professional color palette and typography scale
+  - Responsive grid layouts and flexbox
+  - Smooth animations and transitions
+  - Mobile-first responsive design
+  - Accessibility-focused styling
 
 ## Development Notes
 
+### Backend Architecture
 - Minimum expense amount: $0.01
 - Financial amounts use BigDecimal for precision
 - Server-side pagination (default: 10 items per page)
@@ -175,7 +209,25 @@ Frontend runs on `http://localhost:5173`
 - CORS configured for React dev server (port 5173)
 - Validation annotations ensure data integrity
 - MapStruct handles entity-DTO mapping
-- Comprehensive code documentation following industry standards
+- Comprehensive Javadoc documentation following industry standards
+
+### Frontend Architecture
+- Component-based architecture with reusable form components
+- State management using useReducer pattern for complex state
+- Custom hooks for API integration and data fetching
+- Timezone-safe date handling with proper ISO string conversion
+- CSS design system with custom properties for maintainability
+- Mobile-responsive design with breakpoints at 768px and 480px
+- Performance optimizations with useCallback for event handlers
+- Comprehensive JSDoc documentation for all components and functions
+
+### UI/UX Design Principles
+- **Consistency** - Unified design language across all components
+- **Accessibility** - Proper focus management and keyboard navigation
+- **Performance** - Optimized animations and efficient CSS
+- **Responsiveness** - Seamless experience across all device sizes
+- **Visual Hierarchy** - Clear information architecture and typography
+- **User Feedback** - Loading states, hover effects, and visual confirmations
 
 ## Build for Production
 

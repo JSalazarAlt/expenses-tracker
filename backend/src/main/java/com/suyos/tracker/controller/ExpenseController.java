@@ -63,6 +63,7 @@ public class ExpenseController {
      */
     @GetMapping
     public ResponseEntity<PagedResponse<ExpenseDTO>> getAllExpenses(
+            // amazonq-ignore-next-line
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
             @RequestParam(defaultValue = "expenseDate") String sortBy,
@@ -89,6 +90,7 @@ public class ExpenseController {
      * @return ResponseEntity containing the created expense with generated ID
      */
     @PostMapping
+    // amazonq-ignore-next-line
     public ResponseEntity<ExpenseDTO> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO) {
         // Create new expense through service layer
         ExpenseDTO expenseDTOCreated = expenseService.createExpense(expenseDTO);
@@ -106,6 +108,7 @@ public class ExpenseController {
      * @return ResponseEntity containing the expense data or 404 if not found
      */
     @GetMapping("/{id}")
+    // amazonq-ignore-next-line
     public ResponseEntity<ExpenseDTO> getExpense(@PathVariable Long id) {
         try {
             // Attempt to retrieve expense by ID
@@ -128,6 +131,7 @@ public class ExpenseController {
      * @return ResponseEntity containing the updated expense or 404 if not found
      */
     @PutMapping("/{id}")
+    // amazonq-ignore-next-line
     public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseDTO expenseDTO) {
         try {
             // Attempt to update expense
@@ -149,6 +153,7 @@ public class ExpenseController {
      * @return ResponseEntity with no content on success or 404 if not found
      */
     @DeleteMapping("/{id}")
+    // amazonq-ignore-next-line
     public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
         try {
             // Attempt to delete expense

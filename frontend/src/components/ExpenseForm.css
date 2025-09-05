@@ -1,119 +1,169 @@
 .expense-form {
-    max-width: 500px;
-    margin: 20px auto;
-    padding: 30px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    background-color: #fff;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+    max-width: 540px;
+    margin: var(--space-xl) auto;
+    padding: var(--space-2xl);
+    background: white;
+    border-radius: var(--radius-xl);
+    box-shadow: var(--shadow-xl);
+    border: 1px solid var(--gray-200);
+    position: relative;
+    overflow: hidden;
+}
+
+.expense-form::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--primary-500), var(--primary-600));
 }
 
 .expense-form h2 {
-    margin-bottom: 20px;
-    color: #333;
+    margin-bottom: var(--space-xl);
+    color: var(--gray-900);
     text-align: center;
+    font-size: var(--text-2xl);
+    font-weight: 700;
+    letter-spacing: -0.025em;
 }
 
 .form-group {
-    margin-bottom: 20px;
+    margin-bottom: var(--space-lg);
+}
+
+.form-group:last-of-type {
+    margin-bottom: var(--space-xl);
 }
 
 .form-group label {
     display: block;
-    margin-bottom: 5px;
-    font-weight: 500;
-    color: #555;
+    margin-bottom: var(--space-sm);
+    font-weight: 600;
+    color: var(--gray-700);
+    font-size: var(--text-sm);
+    letter-spacing: 0.025em;
 }
 
 .form-group input,
 .form-group select {
     width: 100%;
-    padding: 12px;
-    border: 2px solid #e2e8f0;
-    border-radius: 8px;
-    font-size: 16px;
-    box-sizing: border-box;
-    transition: all 0.2s ease;
+    padding: var(--space-md) var(--space-lg);
+    border: 2px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
     background: white;
+    transition: all var(--transition-base);
+    color: var(--gray-900);
 }
 
 .form-group input:focus,
 .form-group select:focus {
     outline: none;
-    border-color: #667eea;
+    border-color: var(--primary-500);
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
+    transform: translateY(-1px);
 }
 
+.form-group input:hover,
+.form-group select:hover {
+    border-color: var(--gray-300);
+}
+
+.form-group select {
+    cursor: pointer;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 12px center;
+    background-repeat: no-repeat;
+    background-size: 16px;
+    padding-right: 40px;
+    appearance: none;
+}
 
 
 /* React DatePicker Styling */
 .date-picker-input {
     width: 100% !important;
-    padding: 12px !important;
-    border: 2px solid #e2e8f0 !important;
-    border-radius: 8px !important;
-    font-size: 16px !important;
+    padding: var(--space-md) var(--space-lg) !important;
+    border: 2px solid var(--gray-200) !important;
+    border-radius: var(--radius-lg) !important;
+    font-size: var(--text-base) !important;
     background: white !important;
-    transition: all 0.2s ease !important;
+    transition: all var(--transition-base) !important;
+    color: var(--gray-900) !important;
 }
 
 .date-picker-input:focus {
     outline: none !important;
-    border-color: #667eea !important;
+    border-color: var(--primary-500) !important;
     box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1) !important;
+    transform: translateY(-1px) !important;
+}
+
+.date-picker-input:hover {
+    border-color: var(--gray-300) !important;
 }
 
 .custom-calendar {
     border: none !important;
-    border-radius: 12px !important;
-    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.12) !important;
+    border-radius: var(--radius-xl) !important;
+    box-shadow: var(--shadow-xl) !important;
     font-family: inherit !important;
+    overflow: hidden !important;
 }
 
 .custom-calendar .react-datepicker__header {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+    background: linear-gradient(135deg, var(--primary-500) 0%, var(--primary-600) 100%) !important;
     border-bottom: none !important;
-    border-radius: 12px 12px 0 0 !important;
-    padding: 16px !important;
+    border-radius: 0 !important;
+    padding: var(--space-lg) !important;
 }
 
 .custom-calendar .react-datepicker__current-month {
     color: white !important;
-    font-weight: 600 !important;
-    font-size: 16px !important;
+    font-weight: 700 !important;
+    font-size: var(--text-lg) !important;
+    margin-bottom: var(--space-sm) !important;
 }
 
 .custom-calendar .react-datepicker__day-name {
-    color: rgba(255, 255, 255, 0.8) !important;
-    font-weight: 500 !important;
-    font-size: 12px !important;
+    color: rgba(255, 255, 255, 0.9) !important;
+    font-weight: 600 !important;
+    font-size: var(--text-xs) !important;
+    text-transform: uppercase !important;
+    letter-spacing: 0.05em !important;
 }
 
 .custom-calendar .react-datepicker__day {
-    color: #2d3748 !important;
-    border-radius: 6px !important;
+    color: var(--gray-700) !important;
+    border-radius: var(--radius-md) !important;
     margin: 2px !important;
-    transition: all 0.2s ease !important;
+    transition: all var(--transition-fast) !important;
+    font-weight: 500 !important;
 }
 
 .custom-calendar .react-datepicker__day:hover {
-    background: #667eea !important;
+    background: var(--primary-500) !important;
     color: white !important;
+    transform: scale(1.1) !important;
 }
 
 .custom-calendar .react-datepicker__day--selected {
-    background: #667eea !important;
+    background: var(--primary-600) !important;
     color: white !important;
+    font-weight: 700 !important;
 }
 
 .custom-calendar .react-datepicker__day--today {
-    background: #f7fafc !important;
-    color: #667eea !important;
-    font-weight: 600 !important;
+    background: var(--primary-50) !important;
+    color: var(--primary-700) !important;
+    font-weight: 700 !important;
+    border: 2px solid var(--primary-200) !important;
 }
 
 .custom-calendar .react-datepicker__navigation {
-    top: 20px !important;
+    top: 22px !important;
 }
 
 .custom-calendar .react-datepicker__navigation--previous {
@@ -132,48 +182,90 @@
 
 .currency-symbol {
     position: absolute;
-    left: 12px;
-    font-weight: 600;
-    color: #38a169;
-    font-size: 16px;
-    z-index: 1;
+    left: var(--space-lg);
+    font-weight: 700;
+    color: var(--success-500);
+    font-size: var(--text-lg);
+    z-index: 2;
+    pointer-events: none;
 }
 
 .amount-input-wrapper input {
-    padding-left: 30px;
+    padding-left: 40px !important;
 }
 
 .form-buttons {
     display: flex;
-    gap: 10px;
+    gap: var(--space-md);
     justify-content: center;
-    margin-top: 30px;
+    margin-top: var(--space-2xl);
+    padding-top: var(--space-lg);
+    border-top: 1px solid var(--gray-100);
 }
 
 .btn-primary,
 .btn-secondary {
-    padding: 10px 20px;
-    border: none;
-    border-radius: 4px;
-    font-size: 16px;
+    padding: var(--space-md) var(--space-xl);
+    border: 2px solid transparent;
+    border-radius: var(--radius-lg);
+    font-size: var(--text-base);
+    font-weight: 600;
     cursor: pointer;
-    transition: background-color 0.2s;
+    transition: all var(--transition-base);
+    min-width: 120px;
+    position: relative;
+    overflow: hidden;
 }
 
 .btn-primary {
-    background-color: #007bff;
+    background: linear-gradient(135deg, var(--primary-500), var(--primary-600));
     color: white;
+    box-shadow: var(--shadow-md);
 }
 
 .btn-primary:hover {
-    background-color: #0056b3;
+    background: linear-gradient(135deg, var(--primary-600), var(--primary-700));
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
+}
+
+.btn-primary:active {
+    transform: translateY(0);
+    box-shadow: var(--shadow-md);
 }
 
 .btn-secondary {
-    background-color: #6c757d;
-    color: white;
+    background: white;
+    color: var(--gray-700);
+    border-color: var(--gray-300);
 }
 
 .btn-secondary:hover {
-    background-color: #545b62;
+    background: var(--gray-50);
+    border-color: var(--gray-400);
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+}
+
+.btn-secondary:active {
+    transform: translateY(0);
+    background: var(--gray-100);
+}
+
+/* Responsive Design */
+@media (max-width: 640px) {
+    .expense-form {
+        margin: var(--space-md);
+        padding: var(--space-lg);
+    }
+    
+    .form-buttons {
+        flex-direction: column;
+        gap: var(--space-sm);
+    }
+    
+    .btn-primary,
+    .btn-secondary {
+        width: 100%;
+    }
 }

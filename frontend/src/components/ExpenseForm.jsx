@@ -30,9 +30,7 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
         expenseDate: expense?.expenseDate ? new Date(expense.expenseDate + 'T00:00:00') : new Date(), // Date object
         expenseCategory: expense?.expenseCategory || 'FOOD' // Default to FOOD category
     });
-
-
-
+    
     /**
      * Handles input field changes and updates form state.
      * 
