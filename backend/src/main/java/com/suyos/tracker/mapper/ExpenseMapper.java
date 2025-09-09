@@ -1,6 +1,7 @@
 package com.suyos.tracker.mapper;
 
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingConstants;
 
 import com.suyos.tracker.dto.ExpenseDTO;
@@ -28,10 +29,13 @@ public interface ExpenseMapper {
      * 
      * Used when creating or updating expenses from API requests.
      * The mapping is automatic based on matching field names.
+     * Timestamp fields are ignored as they're managed by Hibernate.
      * 
      * @param expenseDTO the DTO to convert
      * @return the corresponding Expense entity
      */
+    @Mapping(target = "createdAt", ignore = true)
+    @Mapping(target = "updatedAt", ignore = true)
     Expense toEntity(ExpenseDTO expenseDTO);
 
     /**
