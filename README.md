@@ -4,7 +4,7 @@ A full-stack expense tracking application built with Spring Boot backend and Rea
 
 ## Architecture
 
-- **Backend**: Spring Boot 3.5.5 with REST API
+- **Backend**: Spring Boot 3.5.5 with REST APIs
 - **Frontend**: React 19 with Vite
 - **Database**: MySQL
 - **Build Tools**: Maven (backend), Vite (frontend)
