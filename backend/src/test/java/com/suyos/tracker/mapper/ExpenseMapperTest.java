@@ -32,11 +32,11 @@ class ExpenseMapperTest {
     void toDTO_ValidExpense_ReturnsExpenseDTO() {
         // Given
         Expense expense = Expense.builder()
-                .expenseId(1L)
-                .expenseDescription("Test Expense")
-                .expenseAmount(new BigDecimal("25.50"))
-                .expenseDate(LocalDate.of(2024, 1, 15))
-                .expenseCategory(Category.FOOD)
+                .id(1L)
+                .description("Test Expense")
+                .amount(new BigDecimal("25.50"))
+                .date(LocalDate.of(2024, 1, 15))
+                .category(Category.FOOD)
                 .build();
 
         // When
@@ -44,11 +44,11 @@ class ExpenseMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1L, result.getExpenseId());
-        assertEquals("Test Expense", result.getExpenseDescription());
-        assertEquals(new BigDecimal("25.50"), result.getExpenseAmount());
-        assertEquals(LocalDate.of(2024, 1, 15), result.getExpenseDate());
-        assertEquals(Category.FOOD, result.getExpenseCategory());
+        assertEquals(1L, result.getId());
+        assertEquals("Test Expense", result.getDescription());
+        assertEquals(new BigDecimal("25.50"), result.getAmount());
+        assertEquals(LocalDate.of(2024, 1, 15), result.getDate());
+        assertEquals(Category.FOOD, result.getCategory());
     }
 
     @Test
@@ -56,11 +56,11 @@ class ExpenseMapperTest {
     void toEntity_ValidExpenseDTO_ReturnsExpense() {
         // Given
         ExpenseDTO expenseDTO = ExpenseDTO.builder()
-                .expenseId(1L)
-                .expenseDescription("Test Expense")
-                .expenseAmount(new BigDecimal("25.50"))
-                .expenseDate(LocalDate.of(2024, 1, 15))
-                .expenseCategory(Category.FOOD)
+                .id(1L)
+                .description("Test Expense")
+                .amount(new BigDecimal("25.50"))
+                .date(LocalDate.of(2024, 1, 15))
+                .category(Category.FOOD)
                 .build();
 
         // When
@@ -68,11 +68,11 @@ class ExpenseMapperTest {
 
         // Then
         assertNotNull(result);
-        assertEquals(1L, result.getExpenseId());
-        assertEquals("Test Expense", result.getExpenseDescription());
-        assertEquals(new BigDecimal("25.50"), result.getExpenseAmount());
-        assertEquals(LocalDate.of(2024, 1, 15), result.getExpenseDate());
-        assertEquals(Category.FOOD, result.getExpenseCategory());
+        assertEquals(1L, result.getId());
+        assertEquals("Test Expense", result.getDescription());
+        assertEquals(new BigDecimal("25.50"), result.getAmount());
+        assertEquals(LocalDate.of(2024, 1, 15), result.getDate());
+        assertEquals(Category.FOOD, result.getCategory());
     }
 
     @Test
@@ -94,4 +94,5 @@ class ExpenseMapperTest {
         // Then
         assertNull(result);
     }
+    
 }

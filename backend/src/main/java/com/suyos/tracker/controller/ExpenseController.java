@@ -54,7 +54,7 @@ public class ExpenseController {
      * 
      * @param page Zero-based page number (default: 0)
      * @param size Number of records per page (default: 10)
-     * @param sortBy Field name to sort by (default: "expenseDate")
+     * @param sortBy Field name to sort by (default: "date")
      * @param sortDir Sort direction - "asc" or "desc" (default: "desc")
      * @param category Optional category filter (null for no filter)
      * @param startDate Optional start date filter (null for no filter)
@@ -66,7 +66,7 @@ public class ExpenseController {
             // amazonq-ignore-next-line
             @RequestParam(defaultValue = "0") int page,
             @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "expenseDate") String sortBy,
+            @RequestParam(defaultValue = "date") String sortBy,
             @RequestParam(defaultValue = "desc") String sortDir,
             @RequestParam(required = false) Category category,
             @RequestParam(required = false) LocalDate startDate,

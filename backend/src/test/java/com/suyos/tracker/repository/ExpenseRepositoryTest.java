@@ -43,17 +43,17 @@ class ExpenseRepositoryTest {
     @BeforeEach
     void setUp() {
         foodExpense = Expense.builder()
-                .expenseDescription("Grocery Shopping")
-                .expenseAmount(new BigDecimal("45.67"))
-                .expenseDate(LocalDate.of(2024, 1, 15))
-                .expenseCategory(Category.FOOD)
+                .description("Grocery Shopping")
+                .amount(new BigDecimal("45.67"))
+                .date(LocalDate.of(2024, 1, 15))
+                .category(Category.FOOD)
                 .build();
 
         transportExpense = Expense.builder()
-                .expenseDescription("Gas Station")
-                .expenseAmount(new BigDecimal("60.00"))
-                .expenseDate(LocalDate.of(2024, 1, 20))
-                .expenseCategory(Category.TRANSPORTATION)
+                .description("Gas Station")
+                .amount(new BigDecimal("60.00"))
+                .date(LocalDate.of(2024, 1, 20))
+                .category(Category.TRANSPORTATION)
                 .build();
 
         entityManager.persistAndFlush(foodExpense);
@@ -67,13 +67,13 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByExpenseCategory(Category.FOOD, pageable);
+        Page<Expense> result = expenseRepository.findByCategory(Category.FOOD, pageable);
 
         // Then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("Grocery Shopping", result.getContent().get(0).getExpenseDescription());
-        assertEquals(Category.FOOD, result.getContent().get(0).getExpenseCategory());
+        assertEquals("Grocery Shopping", result.getContent().get(0).getDescription());
+        assertEquals(Category.FOOD, result.getContent().get(0).getCategory());
     }
 
     @Test
@@ -85,7 +85,7 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByExpenseDateBetween(startDate, endDate, pageable);
+        Page<Expense> result = expenseRepository.findByDateBetween(startDate, endDate, pageable);
 
         // Then
         assertNotNull(result);
@@ -101,14 +101,14 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByExpenseCategoryAndExpenseDateBetween(
+        Page<Expense> result = expenseRepository.findByCategoryAndDateBetween(
                 Category.FOOD, startDate, endDate, pageable);
 
         // Then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("Grocery Shopping", result.getContent().get(0).getExpenseDescription());
-        assertEquals(Category.FOOD, result.getContent().get(0).getExpenseCategory());
+        assertEquals("Grocery Shopping", result.getContent().get(0).getDescription());
+        assertEquals(Category.FOOD, result.getContent().get(0).getCategory());
     }
 
     @Test
@@ -118,7 +118,7 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByExpenseCategory(Category.HEALTHCARE, pageable);
+        Page<Expense> result = expenseRepository.findByCategory(Category.HEALTHCARE, pageable);
 
         // Then
         assertNotNull(result);
@@ -135,11 +135,12 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByExpenseDateBetween(startDate, endDate, pageable);
+        Page<Expense> result = expenseRepository.findByDateBetween(startDate, endDate, pageable);
 
         // Then
         assertNotNull(result);
         assertTrue(result.getContent().isEmpty());
         assertEquals(0, result.getTotalElements());
     }
+    
 }

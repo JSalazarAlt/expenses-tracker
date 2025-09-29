@@ -62,7 +62,7 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                 const response = await expenseAPI.getPaginated(
                     currentPage, 
                     itemsPerPage, 
-                    "expenseDate", 
+                    "date", 
                     "desc", 
                     filterCategory || null, 
                     filterStartDate ? filterStartDate.toISOString().split('T')[0] : null, 
@@ -93,7 +93,7 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
 
 
     /**
-     * Handles expense deletion and refreshes the current page.
+     * Handles expense deletion and updates local state.
      * 
      * @param {number} id - The ID of the expense to delete
      */
@@ -102,21 +102,21 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
             // Delete expense via API
             await expenseAPI.delete(id);
             
-            // Refresh current page data to reflect deletion
-            const response = await expenseAPI.getPaginated(
-                currentPage, 
-                itemsPerPage, 
-                "expenseDate", 
-                "desc", 
-                filterCategory || null, 
-                filterStartDate ? filterStartDate.toISOString().split('T')[0] : null, 
-                filterEndDate ? filterEndDate.toISOString().split('T')[0] : null
-            );
-            setData(response.content);
-            setTotalPages(response.totalPages);
-            setTotalElements(response.totalElements);
+            // Update local state instead of refetching
+            setData(prev => prev.filter(expense => expense.id !== id));
+            setTotalElements(prev => prev - 1);
+            
+            // Recalculate total pages
+            const newTotalElements = totalElements - 1;
+            const newTotalPages = Math.ceil(newTotalElements / itemsPerPage);
+            setTotalPages(newTotalPages);
+            
+            // If current page becomes empty, go to previous page
+            if (data.length === 1 && currentPage > 0) {
+                setCurrentPage(prev => prev - 1);
+            }
         } catch (err) {
-            setError(err); // Handle deletion errors
+            setError(err);
         }
     };
 
@@ -227,14 +227,14 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                 </thead>
                 <tbody>
                     {data.map(expense => (
-                        <tr key={expense.expenseId}>
-                            <td>{expense.expenseDescription}</td>
-                            <td>{getCategoryIcon(expense.expenseCategory)} {expense.expenseCategory}</td>
-                            <td className="amount">${parseFloat(expense.expenseAmount).toFixed(2)}</td>
-                            <td className="date">{expense.expenseDate}</td>
+                        <tr key={expense.id}>
+                            <td>{expense.description}</td>
+                            <td>{getCategoryIcon(expense.category)} {expense.category}</td>
+                            <td className="amount">${parseFloat(expense.amount).toFixed(2)}</td>
+                            <td className="date">{expense.date}</td>
                             <td className="actions">
                                 <button className="btn-edit" onClick={() => onEditExpense(expense)}>✏️ Edit</button>
-                                <button className="btn-delete" onClick={() => handleDelete(expense.expenseId)}>🗑️ Delete</button>
+                                <button className="btn-delete" onClick={() => handleDelete(expense.id)}>🗑️ Delete</button>
                             </td>
                         </tr>
                     ))}

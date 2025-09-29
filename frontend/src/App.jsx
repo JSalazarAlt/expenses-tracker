@@ -69,7 +69,7 @@ function App() {
     const handleFormSubmit = useCallback(async (formData) => {
         try {
             if (editingExpense) {
-                await expenseAPI.update(editingExpense.expenseId, formData)
+                await expenseAPI.update(editingExpense.id, formData)
             } else {
                 await expenseAPI.create(formData)
             }

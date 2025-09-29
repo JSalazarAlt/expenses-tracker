@@ -49,11 +49,11 @@ class ExpenseControllerTest {
     @BeforeEach
     void setUp() {
         testExpenseDTO = ExpenseDTO.builder()
-                .expenseId(1L)
-                .expenseDescription("Test Expense")
-                .expenseAmount(new BigDecimal("25.50"))
-                .expenseDate(LocalDate.of(2024, 1, 15))
-                .expenseCategory(Category.FOOD)
+                .id(1L)
+                .description("Test Expense")
+                .amount(new BigDecimal("25.50"))
+                .date(LocalDate.of(2024, 1, 15))
+                .category(Category.FOOD)
                 .build();
 
         pagedResponse = PagedResponse.<ExpenseDTO>builder()
@@ -94,18 +94,18 @@ class ExpenseControllerTest {
     void createExpense_ValidExpenseDTO_ReturnsCreatedExpense() throws Exception {
         // Given
         ExpenseDTO newExpenseDTO = ExpenseDTO.builder()
-                .expenseDescription("New Expense")
-                .expenseAmount(new BigDecimal("30.00"))
-                .expenseDate(LocalDate.of(2024, 1, 20))
-                .expenseCategory(Category.TRANSPORTATION)
+                .description("New Expense")
+                .amount(new BigDecimal("30.00"))
+                .date(LocalDate.of(2024, 1, 20))
+                .category(Category.TRANSPORTATION)
                 .build();
 
         ExpenseDTO createdExpenseDTO = ExpenseDTO.builder()
-                .expenseId(2L)
-                .expenseDescription("New Expense")
-                .expenseAmount(new BigDecimal("30.00"))
-                .expenseDate(LocalDate.of(2024, 1, 20))
-                .expenseCategory(Category.TRANSPORTATION)
+                .id(2L)
+                .description("New Expense")
+                .amount(new BigDecimal("30.00"))
+                .date(LocalDate.of(2024, 1, 20))
+                .category(Category.TRANSPORTATION)
                 .build();
 
         when(expenseService.createExpense(any(ExpenseDTO.class))).thenReturn(createdExpenseDTO);
@@ -176,4 +176,5 @@ class ExpenseControllerTest {
 
         verify(expenseService).deleteExpense(999L);
     }
+    
 }

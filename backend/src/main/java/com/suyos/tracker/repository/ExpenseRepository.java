@@ -38,7 +38,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      * @param pageable Pagination and sorting information
      * @return Page of expenses matching the specified category
      */
-    Page<Expense> findByExpenseCategory(Category category, Pageable pageable);
+    Page<Expense> findByCategory(Category category, Pageable pageable);
     
     /**
      * Finds expenses within a date range with pagination.
@@ -48,7 +48,7 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      * @param pageable Pagination and sorting information
      * @return Page of expenses within the specified date range
      */
-    Page<Expense> findByExpenseDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<Expense> findByDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
     
     /**
      * Finds expenses by category and within a date range with pagination.
@@ -59,6 +59,6 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      * @param pageable Pagination and sorting information
      * @return Page of expenses matching both category and date range criteria
      */
-    Page<Expense> findByExpenseCategoryAndExpenseDateBetween(Category category, LocalDate startDate, 
+    Page<Expense> findByCategoryAndDateBetween(Category category, LocalDate startDate, 
         LocalDate endDate, Pageable pageable);
 }

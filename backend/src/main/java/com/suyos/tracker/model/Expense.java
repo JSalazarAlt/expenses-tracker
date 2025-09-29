@@ -50,7 +50,7 @@ public class Expense {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "expense_id")
-    private Long expenseId;
+    private Long id;
 
     /**
      * Descriptive text explaining what the expense was for.
@@ -58,7 +58,7 @@ public class Expense {
      * Examples: "Grocery shopping", "Gas for car", "Monthly rent"
      */
     @Column(name = "expense_description")
-    private String expenseDescription;
+    private String description;
 
     /**
      * Monetary amount of the expense.
@@ -71,7 +71,7 @@ public class Expense {
     @DecimalMin(value = "0.01", inclusive = true, message = "Amount must be at least $0.01")
     @Digits(integer = 7, fraction = 2, message = "Amount must have a maximum of 7 integer digits and 2 decimal places")
     @Column(name = "expense_amount", nullable = false, precision = 17, scale = 2)
-    private BigDecimal expenseAmount;
+    private BigDecimal amount;
 
     /**
      * Date when the expense occurred.
@@ -81,7 +81,7 @@ public class Expense {
      */
     @NotNull(message = "Date is mandatory")
     @Column(name = "expense_date", nullable = false)
-    private LocalDate expenseDate;
+    private LocalDate date;
 
     /**
      * Category classification for the expense.
@@ -92,7 +92,7 @@ public class Expense {
     @NotNull(message = "Category is mandatory")
     @Enumerated(EnumType.STRING)
     @Column(name = "expense_category", nullable = false)
-    private Category expenseCategory;
+    private Category category;
 
     /**
      * Timestamp when the expense record was first created in the system.

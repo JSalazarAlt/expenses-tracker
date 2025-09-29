@@ -70,14 +70,14 @@ public class ExpenseService {
         
         if (category != null && startDate != null && endDate != null) {
             // Filter by both category and date range
-            expensePage = expenseRepository.findByExpenseCategoryAndExpenseDateBetween(
+            expensePage = expenseRepository.findByCategoryAndDateBetween(
                 category, startDate, endDate, pageable);
         } else if (category != null) {
             // Filter by category only
-            expensePage = expenseRepository.findByExpenseCategory(category, pageable);
+            expensePage = expenseRepository.findByCategory(category, pageable);
         } else if (startDate != null && endDate != null) {
             // Filter by date range only
-            expensePage = expenseRepository.findByExpenseDateBetween(startDate, endDate, pageable);
+            expensePage = expenseRepository.findByDateBetween(startDate, endDate, pageable);
         } else {
             // No filters applied - return all expenses
             expensePage = expenseRepository.findAll(pageable);
@@ -156,11 +156,11 @@ public class ExpenseService {
             .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
         
         // Update modifiable fields (preserve ID, createdAt)
-        existingExpense.setExpenseDescription(expenseDTO.getExpenseDescription());
-        existingExpense.setExpenseAmount(expenseDTO.getExpenseAmount());
-        existingExpense.setExpenseDate(expenseDTO.getExpenseDate());
-        existingExpense.setExpenseCategory(expenseDTO.getExpenseCategory());
-        
+        existingExpense.setDescription(expenseDTO.getDescription());
+        existingExpense.setAmount(expenseDTO.getAmount());
+        existingExpense.setDate(expenseDTO.getDate());
+        existingExpense.setCategory(expenseDTO.getCategory());
+
         // Save updated entity (updatedAt timestamp automatically set)
         Expense updatedExpense = expenseRepository.save(existingExpense);
         

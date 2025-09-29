@@ -34,16 +34,16 @@ public class ExpenseDTO {
      * 
      * Null for new expenses being created, populated for existing expenses.
      */
-    @JsonProperty("expenseId")
-    private Long expenseId;
+    @JsonProperty("id")
+    private Long id;
 
     /**
      * Descriptive text explaining what the expense was for.
      * 
      * Examples: "Grocery shopping", "Gas for car", "Monthly rent"
      */
-    @JsonProperty("expenseDescription")
-    private String expenseDescription;
+    @JsonProperty("description")
+    private String description;
 
     /**
      * Monetary amount of the expense.
@@ -51,23 +51,23 @@ public class ExpenseDTO {
      * Uses BigDecimal to maintain precision for financial calculations
      * and avoid floating-point rounding errors.
      */
-    @JsonProperty("expenseAmount")
-    private BigDecimal expenseAmount;
+    @JsonProperty("amount")
+    private BigDecimal amount;
 
     /**
      * Date when the expense occurred.
      * 
      * Represents the actual date of the expense, not when it was recorded.
      */
-    @JsonProperty("expenseDate")
-    private LocalDate expenseDate;
+    @JsonProperty("date")
+    private LocalDate date;
 
     /**
      * Category classification for the expense.
      * 
      * Used for organizing and filtering expenses by type.
      */
-    @JsonProperty("expenseCategory")
-    private Category expenseCategory;
+    @JsonProperty("category")
+    private Category category;
 
 }

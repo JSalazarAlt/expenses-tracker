@@ -36,7 +36,7 @@ export const expenseAPI = {
      * @function getPaginated
      * @param {number} [page=0] - Zero-based page number
      * @param {number} [size=10] - Number of records per page
-     * @param {string} [sortBy="expenseDate"] - Sort field
+     * @param {string} [sortBy="date"] - Sort field
      * @param {string} [sortDir="desc"] - Sort direction (asc/desc)
      * @param {string} [category=null] - Optional category filter
      * @param {string} [startDate=null] - Optional start date filter (YYYY-MM-DD)
@@ -44,7 +44,7 @@ export const expenseAPI = {
      * @returns {Promise<Object>} Promise resolving to paginated response with content and metadata
      * @since 1.0
      */
-    getPaginated: async (page = 0, size = 10, sortBy = "expenseDate", sortDir = "desc", 
+    getPaginated: async (page = 0, size = 10, sortBy = "date", sortDir = "desc", 
         category = null, startDate = null, endDate = null) => {
         const params = { page, size, sortBy, sortDir };
         if (category) params.category = category;
@@ -60,10 +60,10 @@ export const expenseAPI = {
      * 
      * @function create
      * @param {Object} expense - Expense data object
-     * @param {string} expense.expenseDescription - Description of the expense
-     * @param {number} expense.expenseAmount - Monetary amount
-     * @param {string} expense.expenseDate - Date in YYYY-MM-DD format
-     * @param {string} expense.expenseCategory - Category enum value
+     * @param {string} expense.description - Description of the expense
+     * @param {number} expense.amount - Monetary amount
+     * @param {string} expense.date - Date in YYYY-MM-DD format
+     * @param {string} expense.category - Category enum value
      * @returns {Promise<Object>} Promise resolving to created expense with generated ID
      * @since 1.0
      */

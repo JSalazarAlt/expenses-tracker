@@ -25,10 +25,10 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
      * Initialized with existing expense data for editing or empty values for new expense.
      */
     const [formData, setFormData] = useState({
-        expenseDescription: expense?.expenseDescription || '', // Description text
-        expenseAmount: expense?.expenseAmount || '', // Monetary amount
-        expenseDate: expense?.expenseDate ? new Date(expense.expenseDate + 'T00:00:00') : new Date(), // Date object
-        expenseCategory: expense?.expenseCategory || 'FOOD' // Default to FOOD category
+        description: expense?.description || '', // Description text
+        amount: expense?.amount || '', // Monetary amount
+        date: expense?.date ? new Date(expense.date + 'T00:00:00') : new Date(), // Date object
+        category: expense?.category || 'FOOD' // Default to FOOD category
     });
     
     /**
@@ -54,7 +54,7 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
     const handleDateChange = (date) => {
         setFormData(prev => ({
             ...prev,
-            expenseDate: date
+            date: date
         }));
     };
 
@@ -69,7 +69,7 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
         // Convert date to YYYY-MM-DD format for backend
         const submitData = {
             ...formData,
-            expenseDate: formData.expenseDate.toISOString().split('T')[0]
+            date: formData.date.toISOString().split('T')[0]
         };
         
         onSubmit(submitData); // Call parent callback with form data
@@ -80,26 +80,26 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
             <h2>{expense ? 'Edit Expense' : 'Add New Expense'}</h2>
             
             <div className="form-group">
-                <label htmlFor="expenseDescription">Description:</label>
+                <label htmlFor="description">Description:</label>
                 <input
                     type="text"
-                    id="expenseDescription"
-                    name="expenseDescription"
-                    value={formData.expenseDescription}
+                    id="description"
+                    name="description"
+                    value={formData.description}
                     onChange={handleChange}
                     required
                 />
             </div>
 
             <div className="form-group">
-                <label htmlFor="expenseAmount">Amount:</label>
+                <label htmlFor="amount">Amount:</label>
                 <div className="amount-input-wrapper">
                     <span className="currency-symbol">$</span>
                     <input
                         type="number"
-                        id="expenseAmount"
-                        name="expenseAmount"
-                        value={formData.expenseAmount}
+                        id="amount"
+                        name="amount"
+                        value={formData.amount}
                         onChange={handleChange}
                         min="0.01"
                         step="0.01"
@@ -110,9 +110,9 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
             </div>
 
             <div className="form-group">
-                <label htmlFor="expenseDate">Date:</label>
+                <label htmlFor="date">Date:</label>
                 <DatePicker
-                    selected={formData.expenseDate}
+                    selected={formData.date}
                     onChange={handleDateChange}
                     dateFormat="MMM dd, yyyy"
                     maxDate={new Date()}
@@ -125,11 +125,11 @@ function ExpenseForm({ expense, onSubmit, onCancel }) {
             </div>
 
             <div className="form-group">
-                <label htmlFor="expenseCategory">Category:</label>
+                <label htmlFor="category">Category:</label>
                 <select
-                    id="expenseCategory"
-                    name="expenseCategory"
-                    value={formData.expenseCategory}
+                    id="category"
+                    name="category"
+                    value={formData.category}
                     onChange={handleChange}
                     required
                 >
