@@ -46,6 +46,12 @@ public class User {
     @Column(name = "user_password", nullable = false)
     private String passwordHash;
 
+    @Column(name = "user_password_changed_at")
+    private LocalDateTime passwordChangedAt;
+
+    @Column(name = "user_must_change_password")
+    private Boolean mustChangePassword = false;
+
     @Column(name = "user_first_name", nullable = false)
     private String firstName;
 
@@ -61,8 +67,26 @@ public class User {
     @Column(name = "user_account_enabled")
     private Boolean accountEnabled;
 
+    @Column(name = "user_email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
+    @Column(name = "user_account_locked", nullable = false)
+    private Boolean accountLocked = false;
+
+    @Column(name = "user_failed_login_attempts")
+    private Integer failedLoginAttempts = 0;
+
+    @Column(name = "user_locked_until")
+    private LocalDateTime lockedUntil;
+
     @Column(name = "user_last_login_at")
     private LocalDateTime lastLoginAt;
+
+    @Column(name = "user_terms_accepted_at")
+    private LocalDateTime termsAcceptedAt;
+
+    @Column(name = "user_privacy_policy_accepted_at")
+    private LocalDateTime privacyPolicyAcceptedAt;
 
     @Column(name = "user_locale")
     private String locale;
