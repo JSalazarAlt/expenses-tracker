@@ -61,4 +61,5 @@ public interface ExpenseRepository extends JpaRepository<Expense, Long> {
      */
     Page<Expense> findByCategoryAndDateBetween(Category category, LocalDate startDate, 
         LocalDate endDate, Pageable pageable);
+        
 }

@@ -59,8 +59,8 @@ public class User {
      * Must be unique across all users. Optional alternative
      * identifier that can be used for login if implemented.
      */
-    @Column(name = "user_name", nullable = false, unique = true)
-    private String userName;
+    @Column(name = "username", nullable = false, unique = true)
+    private String username;
 
     /**
      * Encrypted password hash for user authentication.

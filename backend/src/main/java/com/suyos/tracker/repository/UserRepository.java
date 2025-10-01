@@ -45,10 +45,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Finds a user by their username.
      * 
-     * @param userName The username to search for
+     * @param username The username to search for
      * @return Optional containing the user if found, empty otherwise
      */
-    Optional<User> findByUserName(String userName);
+    Optional<User> findByUsername(String username);
     
     /**
      * Checks if an email address is already registered.
@@ -61,10 +61,10 @@ public interface UserRepository extends JpaRepository<User, Long> {
     /**
      * Checks if a username is already taken.
      * 
-     * @param userName The username to check
+     * @param username The username to check
      * @return true if username exists, false otherwise
      */
-    boolean existsByUserName(String userName);
+    boolean existsByUsername(String username);
     
     /**
      * Finds an active user by email address.
