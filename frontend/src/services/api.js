@@ -18,6 +18,35 @@ const apiClient = axios.create({
     }
 });
 
+// Add request interceptor to include JWT token
+apiClient.interceptors.request.use(
+    (config) => {
+        const token = localStorage.getItem('token');
+        if (token) {
+            config.headers.Authorization = `Bearer ${token}`;
+        }
+        return config;
+    },
+    (error) => {
+        return Promise.reject(error);
+    }
+);
+
+// Add response interceptor to handle authentication errors
+apiClient.interceptors.response.use(
+    (response) => response,
+    (error) => {
+        if (error.response?.status === 401) {
+            // Clear stored auth data on unauthorized response
+            localStorage.removeItem('token');
+            localStorage.removeItem('user');
+            // Redirect to login or trigger auth state update
+            window.location.reload();
+        }
+        return Promise.reject(error);
+    }
+);
+
 /**
  * API service object containing all expense-related HTTP operations.
  * 
@@ -98,5 +127,76 @@ export const expenseAPI = {
      */
     delete: async (id) => {
         await apiClient.delete(`/expenses/${id}`);
+    }
+};
+
+/**
+ * Authentication API service for user login, registration, and JWT management.
+ * 
+ * @namespace authAPI
+ * @author Joel Salazar
+ * @since 1.0
+ */
+export const authAPI = {
+    /**
+     * Authenticates user login and returns JWT token.
+     * 
+     * @function login
+     * @param {Object} credentials - User login credentials
+     * @param {string} credentials.email - User's email address
+     * @param {string} credentials.password - User's password
+     * @returns {Promise<Object>} Promise resolving to authentication response with token and user info
+     * @since 1.0
+     */
+    login: async (credentials) => {
+        const response = await apiClient.post('/users/login', credentials);
+        return response.data;
+    },
+
+    /**
+     * Registers a new user account.
+     * 
+     * @function register
+     * @param {Object} userData - New user registration data
+     * @param {string} userData.email - User's email address
+     * @param {string} userData.password - User's password
+     * @param {string} userData.username - User's chosen username
+     * @param {string} userData.firstName - User's first name
+     * @param {string} userData.lastName - User's last name
+     * @param {boolean} userData.termsAccepted - Terms acceptance flag
+     * @param {boolean} userData.privacyPolicyAccepted - Privacy policy acceptance flag
+     * @returns {Promise<Object>} Promise resolving to created user profile
+     * @since 1.0
+     */
+    register: async (userData) => {
+        const response = await apiClient.post('/users/register', userData);
+        return response.data;
+    },
+
+    /**
+     * Sets the authorization token for API requests.
+     * 
+     * @function setAuthToken
+     * @param {string} token - JWT token to set
+     * @since 1.0
+     */
+    setAuthToken: (token) => {
+        if (token) {
+            apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
+        } else {
+            delete apiClient.defaults.headers.common['Authorization'];
+        }
+    },
+
+    /**
+     * Logs out the current user by clearing stored authentication data.
+     * 
+     * @function logout
+     * @since 1.0
+     */
+    logout: () => {
+        localStorage.removeItem('token');
+        localStorage.removeItem('user');
+        delete apiClient.defaults.headers.common['Authorization'];
     }
 };

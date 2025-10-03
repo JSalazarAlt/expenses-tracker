@@ -27,7 +27,9 @@ import com.suyos.tracker.dto.PagedResponse;
 import com.suyos.tracker.mapper.ExpenseMapper;
 import com.suyos.tracker.model.Category;
 import com.suyos.tracker.model.Expense;
+import com.suyos.tracker.model.User;
 import com.suyos.tracker.repository.ExpenseRepository;
+import com.suyos.tracker.repository.UserRepository;
 
 /**
  * Unit tests for ExpenseService.
@@ -43,6 +45,9 @@ class ExpenseServiceTest {
     private ExpenseRepository expenseRepository;
 
     @Mock
+    private UserRepository userRepository;
+
+    @Mock
     private ExpenseMapper expenseMapper;
 
     @InjectMocks
@@ -50,6 +55,7 @@ class ExpenseServiceTest {
 
     private Expense testExpense;
     private ExpenseDTO testExpenseDTO;
+    private User testUser;
 
     @BeforeEach
     void setUp() {
@@ -68,6 +74,11 @@ class ExpenseServiceTest {
                 .date(LocalDate.of(2024, 1, 15))
                 .category(Category.FOOD)
                 .build();
+
+        testUser = User.builder()
+                .id(1L)
+                .email("test@example.com")
+                .build();
     }
 
     @Test
@@ -77,12 +88,13 @@ class ExpenseServiceTest {
         Pageable pageable = PageRequest.of(0, 10, Sort.by("expenseDate").descending());
         Page<Expense> expensePage = new PageImpl<>(List.of(testExpense), pageable, 1);
         
-        when(expenseRepository.findAll(pageable)).thenReturn(expensePage);
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(expenseRepository.findByUserId(testUser.getId(), pageable)).thenReturn(expensePage);
         when(expenseMapper.toDTO(testExpense)).thenReturn(testExpenseDTO);
 
         // When
-        PagedResponse<ExpenseDTO> result = expenseService.getExpensesPaginated(
-                0, 10, "expenseDate", "desc", null, null, null);
+        PagedResponse<ExpenseDTO> result = expenseService.getAllExpensesPaginated(
+                1L, 0, 10, "date", "desc", null, null, null);
 
         // Then
         assertNotNull(result);
@@ -94,7 +106,8 @@ class ExpenseServiceTest {
         assertTrue(result.isFirst());
         assertTrue(result.isLast());
 
-        verify(expenseRepository).findAll(pageable);
+        verify(userRepository).findById(1L);
+        verify(expenseRepository).findByUserId(testUser.getId(), pageable);
         verify(expenseMapper).toDTO(testExpense);
     }
 
@@ -102,16 +115,18 @@ class ExpenseServiceTest {
     @DisplayName("Should get expense by ID successfully")
     void getExpenseById_ExistingId_ReturnsExpenseDTO() {
         // Given
-        when(expenseRepository.findById(1L)).thenReturn(Optional.of(testExpense));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(expenseRepository.findByIdAndUserId(1L, testUser.getId())).thenReturn(Optional.of(testExpense));
         when(expenseMapper.toDTO(testExpense)).thenReturn(testExpenseDTO);
 
         // When
-        ExpenseDTO result = expenseService.getExpenseById(1L);
+        ExpenseDTO result = expenseService.getExpenseById(1L, 1L);
 
         // Then
         assertNotNull(result);
         assertEquals(testExpenseDTO, result);
-        verify(expenseRepository).findById(1L);
+        verify(userRepository).findById(1L);
+        verify(expenseRepository).findByIdAndUserId(1L, testUser.getId());
         verify(expenseMapper).toDTO(testExpense);
     }
 
@@ -119,14 +134,16 @@ class ExpenseServiceTest {
     @DisplayName("Should throw exception when expense not found by ID")
     void getExpenseById_NonExistingId_ThrowsException() {
         // Given
-        when(expenseRepository.findById(999L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(expenseRepository.findByIdAndUserId(999L, testUser.getId())).thenReturn(Optional.empty());
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class, 
-                () -> expenseService.getExpenseById(999L));
+                () -> expenseService.getExpenseById(999L, 1L));
         
         assertEquals("Expense not found with id: 999", exception.getMessage());
-        verify(expenseRepository).findById(999L);
+        verify(userRepository).findById(1L);
+        verify(expenseRepository).findByIdAndUserId(999L, testUser.getId());
         verifyNoInteractions(expenseMapper);
     }
 
@@ -164,17 +181,19 @@ class ExpenseServiceTest {
                 .category(Category.TRANSPORTATION)
                 .build();
 
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
         when(expenseMapper.toEntity(newExpenseDTO)).thenReturn(newExpense);
         when(expenseRepository.save(newExpense)).thenReturn(savedExpense);
         when(expenseMapper.toDTO(savedExpense)).thenReturn(savedExpenseDTO);
 
         // When
-        ExpenseDTO result = expenseService.createExpense(newExpenseDTO);
+        ExpenseDTO result = expenseService.createExpense(newExpenseDTO, 1L);
 
         // Then
         assertNotNull(result);
         assertEquals(2L, result.getId());
         assertEquals("New Expense", result.getDescription());
+        verify(userRepository).findById(1L);
         verify(expenseMapper).toEntity(newExpenseDTO);
         verify(expenseRepository).save(newExpense);
         verify(expenseMapper).toDTO(savedExpense);
@@ -184,13 +203,15 @@ class ExpenseServiceTest {
     @DisplayName("Should delete expense successfully")
     void deleteExpense_ExistingId_DeletesExpense() {
         // Given
-        when(expenseRepository.findById(1L)).thenReturn(Optional.of(testExpense));
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(expenseRepository.findByIdAndUserId(1L, testUser.getId())).thenReturn(Optional.of(testExpense));
 
         // When
-        expenseService.deleteExpense(1L);
+        expenseService.deleteExpenseById(1L, 1L);
 
         // Then
-        verify(expenseRepository).findById(1L);
+        verify(userRepository).findById(1L);
+        verify(expenseRepository).findByIdAndUserId(1L, testUser.getId());
         verify(expenseRepository).delete(testExpense);
     }
 
@@ -198,14 +219,16 @@ class ExpenseServiceTest {
     @DisplayName("Should throw exception when deleting non-existing expense")
     void deleteExpense_NonExistingId_ThrowsException() {
         // Given
-        when(expenseRepository.findById(999L)).thenReturn(Optional.empty());
+        when(userRepository.findById(1L)).thenReturn(Optional.of(testUser));
+        when(expenseRepository.findByIdAndUserId(999L, testUser.getId())).thenReturn(Optional.empty());
 
         // When & Then
         RuntimeException exception = assertThrows(RuntimeException.class, 
-                () -> expenseService.deleteExpense(999L));
-        
+                () -> expenseService.deleteExpenseById(999L, 1L));
+
         assertEquals("Expense not found with id: 999", exception.getMessage());
-        verify(expenseRepository).findById(999L);
+        verify(userRepository).findById(1L);
+        verify(expenseRepository).findByIdAndUserId(999L, testUser.getId());
         verify(expenseRepository, never()).delete(any());
     }
     

@@ -23,6 +23,7 @@ import com.suyos.tracker.dto.ExpenseDTO;
 import com.suyos.tracker.dto.PagedResponse;
 import com.suyos.tracker.model.Category;
 import com.suyos.tracker.service.ExpenseService;
+import com.suyos.tracker.service.UserService;
 
 /**
  * Controller tests for ExpenseController.
@@ -39,6 +40,9 @@ class ExpenseControllerTest {
 
     @MockBean
     private ExpenseService expenseService;
+
+    @MockBean
+    private UserService userService;
 
     @Autowired
     private ObjectMapper objectMapper;
@@ -71,7 +75,8 @@ class ExpenseControllerTest {
     @DisplayName("Should get all expenses successfully")
     void getAllExpenses_ValidRequest_ReturnsPagedResponse() throws Exception {
         // Given
-        when(expenseService.getExpensesPaginated(0, 10, "expenseDate", "desc", null, null, null))
+        when(userService.getCurrentUserId()).thenReturn(1L);
+        when(expenseService.getAllExpensesPaginated(1L, 0, 10, "date", "desc", null, null, null))
                 .thenReturn(pagedResponse);
 
         // When & Then
@@ -81,12 +86,13 @@ class ExpenseControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
                 .andExpect(jsonPath("$.content").isArray())
-                .andExpect(jsonPath("$.content[0].expenseId").value(1))
-                .andExpect(jsonPath("$.content[0].expenseDescription").value("Test Expense"))
+                .andExpect(jsonPath("$.content[0].id").value(1))
+                .andExpect(jsonPath("$.content[0].description").value("Test Expense"))
                 .andExpect(jsonPath("$.currentPage").value(0))
                 .andExpect(jsonPath("$.totalElements").value(1));
 
-        verify(expenseService).getExpensesPaginated(0, 10, "expenseDate", "desc", null, null, null);
+        verify(userService).getCurrentUserId();
+        verify(expenseService).getAllExpensesPaginated(1L, 0, 10, "date", "desc", null, null, null);
     }
 
     @Test
@@ -108,7 +114,8 @@ class ExpenseControllerTest {
                 .category(Category.TRANSPORTATION)
                 .build();
 
-        when(expenseService.createExpense(any(ExpenseDTO.class))).thenReturn(createdExpenseDTO);
+        when(userService.getCurrentUserId()).thenReturn(1L);
+        when(expenseService.createExpense(any(ExpenseDTO.class), eq(1L))).thenReturn(createdExpenseDTO);
 
         // When & Then
         mockMvc.perform(post("/api/expenses")
@@ -116,65 +123,74 @@ class ExpenseControllerTest {
                 .content(objectMapper.writeValueAsString(newExpenseDTO)))
                 .andExpect(status().isCreated())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.expenseId").value(2))
-                .andExpect(jsonPath("$.expenseDescription").value("New Expense"));
+                .andExpect(jsonPath("$.id").value(2))
+                .andExpect(jsonPath("$.description").value("New Expense"));
 
-        verify(expenseService).createExpense(any(ExpenseDTO.class));
+        verify(userService).getCurrentUserId();
+        verify(expenseService).createExpense(any(ExpenseDTO.class), eq(1L));
     }
 
     @Test
     @DisplayName("Should get expense by ID successfully")
     void getExpense_ExistingId_ReturnsExpense() throws Exception {
         // Given
-        when(expenseService.getExpenseById(1L)).thenReturn(testExpenseDTO);
+        when(userService.getCurrentUserId()).thenReturn(1L);
+        when(expenseService.getExpenseById(1L, 1L)).thenReturn(testExpenseDTO);
 
         // When & Then
         mockMvc.perform(get("/api/expenses/1"))
                 .andExpect(status().isOk())
                 .andExpect(content().contentType(MediaType.APPLICATION_JSON))
-                .andExpect(jsonPath("$.expenseId").value(1))
-                .andExpect(jsonPath("$.expenseDescription").value("Test Expense"));
+                .andExpect(jsonPath("$.id").value(1))
+                .andExpect(jsonPath("$.description").value("Test Expense"));
 
-        verify(expenseService).getExpenseById(1L);
+        verify(userService).getCurrentUserId();
+        verify(expenseService).getExpenseById(1L, 1L);
     }
 
     @Test
     @DisplayName("Should return 404 when expense not found")
     void getExpense_NonExistingId_ReturnsNotFound() throws Exception {
         // Given
-        when(expenseService.getExpenseById(999L)).thenThrow(new RuntimeException("Expense not found"));
+        when(userService.getCurrentUserId()).thenReturn(1L);
+        when(expenseService.getExpenseById(999L, 1L)).thenThrow(new RuntimeException("Expense not found"));
 
         // When & Then
         mockMvc.perform(get("/api/expenses/999"))
                 .andExpect(status().isNotFound());
 
-        verify(expenseService).getExpenseById(999L);
+        verify(userService).getCurrentUserId();
+        verify(expenseService).getExpenseById(999L, 1L);
     }
 
     @Test
     @DisplayName("Should delete expense successfully")
     void deleteExpense_ExistingId_ReturnsNoContent() throws Exception {
         // Given
-        doNothing().when(expenseService).deleteExpense(1L);
+        when(userService.getCurrentUserId()).thenReturn(1L);
+        doNothing().when(expenseService).deleteExpenseById(1L, 1L);
 
         // When & Then
         mockMvc.perform(delete("/api/expenses/1"))
                 .andExpect(status().isNoContent());
 
-        verify(expenseService).deleteExpense(1L);
+        verify(userService).getCurrentUserId();
+        verify(expenseService).deleteExpenseById(1L, 1L);
     }
 
     @Test
     @DisplayName("Should return 404 when deleting non-existing expense")
     void deleteExpense_NonExistingId_ReturnsNotFound() throws Exception {
         // Given
-        doThrow(new RuntimeException("Expense not found")).when(expenseService).deleteExpense(999L);
+        when(userService.getCurrentUserId()).thenReturn(1L);
+        doThrow(new RuntimeException("Expense not found")).when(expenseService).deleteExpenseById(999L, 1L);
 
         // When & Then
         mockMvc.perform(delete("/api/expenses/999"))
                 .andExpect(status().isNotFound());
 
-        verify(expenseService).deleteExpense(999L);
+        verify(userService).getCurrentUserId();
+        verify(expenseService).deleteExpenseById(999L, 1L);
     }
     
 }

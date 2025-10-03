@@ -1,6 +1,7 @@
 package com.suyos.tracker.repository;
 
 import java.time.LocalDate;
+import java.util.Optional;
 
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -32,34 +33,55 @@ import com.suyos.tracker.model.Expense;
 public interface ExpenseRepository extends JpaRepository<Expense, Long> {
     
     /**
-     * Finds expenses by category with pagination.
+     * Finds all expenses for a specific user with pagination.
      * 
-     * @param category The expense category to filter by
+     * @param userId The ID of the user whose expenses to retrieve
      * @param pageable Pagination and sorting information
-     * @return Page of expenses matching the specified category
+     * @return Page of expenses belonging to the specified user
      */
-    Page<Expense> findByCategory(Category category, Pageable pageable);
+    Page<Expense> findByUserId(Long userId, Pageable pageable);
     
     /**
-     * Finds expenses within a date range with pagination.
+     * Finds expenses by user and category with pagination.
      * 
+     * @param userId The ID of the user whose expenses to retrieve
+     * @param category The expense category to filter by
+     * @param pageable Pagination and sorting information
+     * @return Page of expenses matching user and category criteria
+     */
+    Page<Expense> findByUserIdAndCategory(Long userId, Category category, Pageable pageable);
+    
+    /**
+     * Finds expenses by user within a date range with pagination.
+     * 
+     * @param userId The ID of the user whose expenses to retrieve
      * @param startDate The start date (inclusive)
      * @param endDate The end date (inclusive)
      * @param pageable Pagination and sorting information
-     * @return Page of expenses within the specified date range
+     * @return Page of expenses matching user and date range criteria
      */
-    Page<Expense> findByDateBetween(LocalDate startDate, LocalDate endDate, Pageable pageable);
+    Page<Expense> findByUserIdAndDateBetween(Long userId, LocalDate startDate, LocalDate endDate, Pageable pageable);
     
     /**
-     * Finds expenses by category and within a date range with pagination.
+     * Finds expenses by user, category and within a date range with pagination.
      * 
+     * @param userId The ID of the user whose expenses to retrieve
      * @param category The expense category to filter by
      * @param startDate The start date (inclusive)
      * @param endDate The end date (inclusive)
      * @param pageable Pagination and sorting information
-     * @return Page of expenses matching both category and date range criteria
+     * @return Page of expenses matching user, category and date range criteria
      */
-    Page<Expense> findByCategoryAndDateBetween(Category category, LocalDate startDate, 
-        LocalDate endDate, Pageable pageable);
+    Page<Expense> findByUserIdAndCategoryAndDateBetween(Long userId, Category category, 
+        LocalDate startDate, LocalDate endDate, Pageable pageable);
+    
+    /**
+     * Finds a specific expense by ID and user ID.
+     * 
+     * @param id The expense ID
+     * @param userId The user ID who owns the expense
+     * @return Optional containing the expense if found and owned by user
+     */
+    Optional<Expense> findByIdAndUserId(Long id, Long userId);
         
 }

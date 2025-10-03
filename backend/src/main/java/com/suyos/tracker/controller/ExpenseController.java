@@ -19,6 +19,7 @@ import com.suyos.tracker.dto.ExpenseDTO;
 import com.suyos.tracker.dto.PagedResponse;
 import com.suyos.tracker.model.Category;
 import com.suyos.tracker.service.ExpenseService;
+import com.suyos.tracker.service.UserService;
 
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -46,11 +47,14 @@ public class ExpenseController {
     /** Service layer for expense business logic */
     private final ExpenseService expenseService;
     
+    /** Service layer for user operations */
+    private final UserService userService;
+    
     /**
-     * Retrieves expenses with pagination, sorting, and filtering support.
+     * Retrieves expenses with pagination, sorting, and filtering support for the authenticated user.
      * 
      * This endpoint supports server-side pagination to efficiently handle large datasets.
-     * Results can be filtered by category and date range, and sorted by any field.
+     * Results are filtered by the current user and can be further filtered by category and date range.
      * 
      * @param page Zero-based page number (default: 0)
      * @param size Number of records per page (default: 10)
@@ -71,16 +75,19 @@ public class ExpenseController {
             @RequestParam(required = false) LocalDate startDate,
             @RequestParam(required = false) LocalDate endDate) {
         
-        // Fetch paginated expenses from service layer
-        PagedResponse<ExpenseDTO> expenses = expenseService.getExpensesPaginated(page, size, sortBy, sortDir,
-            category, startDate, endDate);
+        // Get current user ID from authentication context
+        Long userId = userService.getCurrentUserId();
+        
+        // Fetch paginated expenses from service layer for current user
+        PagedResponse<ExpenseDTO> expenses = expenseService.getAllExpensesPaginated(userId, page, 
+            size, sortBy, sortDir, category, startDate, endDate);
         
         // Return successful response with data
         return ResponseEntity.ok(expenses);
     }
     
     /**
-     * Creates a new expense record.
+     * Creates a new expense record for the authenticated user.
      * 
      * The request body is validated using Bean Validation annotations.
      * Returns HTTP 201 (Created) status on successful creation.
@@ -90,17 +97,20 @@ public class ExpenseController {
      */
     @PostMapping
     public ResponseEntity<ExpenseDTO> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO) {
-        // Create new expense through service layer
-        ExpenseDTO expenseDTOCreated = expenseService.createExpense(expenseDTO);
+        // Get current user ID from authentication context
+        Long userId = userService.getCurrentUserId();
+        
+        // Create new expense through service layer for current user
+        ExpenseDTO expenseDTOCreated = expenseService.createExpense(expenseDTO, userId);
         
         // Return 201 Created status with the new expense data
         return ResponseEntity.status(HttpStatus.CREATED).body(expenseDTOCreated);
     }
     
     /**
-     * Retrieves a specific expense by ID.
+     * Retrieves a specific expense by ID for the authenticated user.
      * 
-     * Returns HTTP 404 (Not Found) if no expense exists with the given ID.
+     * Returns HTTP 404 (Not Found) if no expense exists with the given ID for the current user.
      * 
      * @param id The unique identifier of the expense
      * @return ResponseEntity containing the expense data or 404 if not found
@@ -108,8 +118,11 @@ public class ExpenseController {
     @GetMapping("/{id}")
     public ResponseEntity<ExpenseDTO> getExpense(@PathVariable Long id) {
         try {
-            // Attempt to retrieve expense by ID
-            ExpenseDTO expenseDTO = expenseService.getExpenseById(id);
+            // Get current user ID from authentication context
+            Long userId = userService.getCurrentUserId();
+            
+            // Attempt to retrieve expense by ID for current user
+            ExpenseDTO expenseDTO = expenseService.getExpenseById(id, userId);
             return ResponseEntity.ok(expenseDTO);
         } catch (RuntimeException e) {
             // Return 404 if expense not found
@@ -118,10 +131,10 @@ public class ExpenseController {
     }
     
     /**
-     * Updates an existing expense record.
+     * Updates an existing expense record for the authenticated user.
      * 
-     * The request body is validated and the expense ID must exist.
-     * Returns HTTP 404 (Not Found) if no expense exists with the given ID.
+     * The request body is validated and the expense ID must exist and belong to the current user.
+     * Returns HTTP 404 (Not Found) if no expense exists with the given ID for the current user.
      * 
      * @param id The ID of the expense to update
      * @param expenseDTO The updated expense data (validated)
@@ -130,8 +143,11 @@ public class ExpenseController {
     @PutMapping("/{id}")
     public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseDTO expenseDTO) {
         try {
-            // Attempt to update expense
-            ExpenseDTO updated = expenseService.updateExpense(id, expenseDTO);
+            // Get current user ID from authentication context
+            Long userId = userService.getCurrentUserId();
+            
+            // Attempt to update expense for current user
+            ExpenseDTO updated = expenseService.updateExpenseById(id, expenseDTO, userId);
             return ResponseEntity.ok(updated);
         } catch (RuntimeException e) {
             // Return 404 if expense not found
@@ -140,10 +156,10 @@ public class ExpenseController {
     }
     
     /**
-     * Deletes an expense record by ID.
+     * Deletes an expense record by ID for the authenticated user.
      * 
      * Returns HTTP 204 (No Content) on successful deletion.
-     * Returns HTTP 404 (Not Found) if no expense exists with the given ID.
+     * Returns HTTP 404 (Not Found) if no expense exists with the given ID for the current user.
      * 
      * @param id The ID of the expense to delete
      * @return ResponseEntity with no content on success or 404 if not found
@@ -151,8 +167,11 @@ public class ExpenseController {
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
         try {
-            // Attempt to delete expense
-            expenseService.deleteExpense(id);
+            // Get current user ID from authentication context
+            Long userId = userService.getCurrentUserId();
+            
+            // Attempt to delete expense for current user
+            expenseService.deleteExpenseById(id, userId);
             
             // Return 204 No Content on successful deletion
             return ResponseEntity.noContent().build();

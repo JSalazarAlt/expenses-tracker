@@ -19,6 +19,7 @@ import org.springframework.data.domain.Pageable;
 
 import com.suyos.tracker.model.Category;
 import com.suyos.tracker.model.Expense;
+import com.suyos.tracker.model.User;
 
 /**
  * Repository tests for ExpenseRepository.
@@ -39,14 +40,23 @@ class ExpenseRepositoryTest {
 
     private Expense foodExpense;
     private Expense transportExpense;
+    private User testUser;
 
     @BeforeEach
     void setUp() {
+        testUser = User.builder()
+                .email("test@example.com")
+                .password("password")
+                .username("testuser")
+                .build();
+        entityManager.persistAndFlush(testUser);
+
         foodExpense = Expense.builder()
                 .description("Grocery Shopping")
                 .amount(new BigDecimal("45.67"))
                 .date(LocalDate.of(2024, 1, 15))
                 .category(Category.FOOD)
+                .user(testUser)
                 .build();
 
         transportExpense = Expense.builder()
@@ -54,6 +64,7 @@ class ExpenseRepositoryTest {
                 .amount(new BigDecimal("60.00"))
                 .date(LocalDate.of(2024, 1, 20))
                 .category(Category.TRANSPORTATION)
+                .user(testUser)
                 .build();
 
         entityManager.persistAndFlush(foodExpense);
@@ -67,7 +78,8 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByCategory(Category.FOOD, pageable);
+        Page<Expense> result = expenseRepository.findByUserIdAndCategory(testUser.getId(), 
+            Category.FOOD, pageable);
 
         // Then
         assertNotNull(result);
@@ -85,7 +97,8 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByDateBetween(startDate, endDate, pageable);
+        Page<Expense> result = expenseRepository.findByUserIdAndDateBetween(testUser.getId(), 
+            startDate, endDate, pageable);
 
         // Then
         assertNotNull(result);
@@ -101,8 +114,8 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByCategoryAndDateBetween(
-                Category.FOOD, startDate, endDate, pageable);
+        Page<Expense> result = expenseRepository.findByUserIdAndCategoryAndDateBetween(
+                testUser.getId(), Category.FOOD, startDate, endDate, pageable);
 
         // Then
         assertNotNull(result);
@@ -118,7 +131,8 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByCategory(Category.HEALTHCARE, pageable);
+        Page<Expense> result = expenseRepository.findByUserIdAndCategory(testUser.getId(), 
+            Category.HEALTHCARE, pageable);
 
         // Then
         assertNotNull(result);
@@ -135,7 +149,8 @@ class ExpenseRepositoryTest {
         Pageable pageable = PageRequest.of(0, 10);
 
         // When
-        Page<Expense> result = expenseRepository.findByDateBetween(startDate, endDate, pageable);
+        Page<Expense> result = expenseRepository.findByUserIdAndDateBetween(testUser.getId(), 
+            startDate, endDate, pageable);
 
         // Then
         assertNotNull(result);

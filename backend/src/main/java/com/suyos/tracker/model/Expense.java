@@ -11,9 +11,12 @@ import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Digits;
@@ -49,7 +52,7 @@ public class Expense {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "expense_id")
+    @Column(name = "id")
     private Long id;
 
     /**
@@ -57,7 +60,7 @@ public class Expense {
      * 
      * Examples: "Grocery shopping", "Gas for car", "Monthly rent"
      */
-    @Column(name = "expense_description")
+    @Column(name = "description")
     private String description;
 
     /**
@@ -70,7 +73,7 @@ public class Expense {
     @NotNull(message = "Amount is mandatory")
     @DecimalMin(value = "0.01", inclusive = true, message = "Amount must be at least $0.01")
     @Digits(integer = 7, fraction = 2, message = "Amount must have a maximum of 7 integer digits and 2 decimal places")
-    @Column(name = "expense_amount", nullable = false, precision = 17, scale = 2)
+    @Column(name = "amount", nullable = false, precision = 17, scale = 2)
     private BigDecimal amount;
 
     /**
@@ -80,7 +83,7 @@ public class Expense {
      * This represents when the expense actually happened, not when it was recorded.
      */
     @NotNull(message = "Date is mandatory")
-    @Column(name = "expense_date", nullable = false)
+    @Column(name = "date", nullable = false)
     private LocalDate date;
 
     /**
@@ -91,8 +94,20 @@ public class Expense {
      */
     @NotNull(message = "Category is mandatory")
     @Enumerated(EnumType.STRING)
-    @Column(name = "expense_category", nullable = false)
+    @Column(name = "category", nullable = false)
     private Category category;
+
+    /**
+     * User who owns this expense record.
+     * 
+     * Establishes a many-to-one relationship where multiple expenses
+     * can belong to a single user. Uses lazy loading for performance
+     * and foreign key constraint for data integrity.
+     */
+    @NotNull(message = "User is mandatory")
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "user_id", nullable = false)
+    private User user;
 
     /**
      * Timestamp when the expense record was first created in the system.

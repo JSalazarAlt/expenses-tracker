@@ -14,7 +14,9 @@ import com.suyos.tracker.dto.PagedResponse;
 import com.suyos.tracker.mapper.ExpenseMapper;
 import com.suyos.tracker.model.Category;
 import com.suyos.tracker.model.Expense;
+import com.suyos.tracker.model.User;
 import com.suyos.tracker.repository.ExpenseRepository;
+import com.suyos.tracker.repository.UserRepository;
 
 import lombok.RequiredArgsConstructor;
 
@@ -37,15 +39,18 @@ public class ExpenseService {
     /** Repository for expense data access operations */
     private final ExpenseRepository expenseRepository;
     
+    /** Repository for user data access operations */
+    private final UserRepository userRepository;
+    
     /** Mapper for converting between entities and DTOs */
     private final ExpenseMapper expenseMapper;
     
     /**
-     * Retrieves expenses with pagination, sorting, and optional filtering.
+     * Retrieves expenses with pagination, sorting, and optional filtering for a specific user.
      * 
      * This method provides efficient data access for large datasets by implementing
      * server-side pagination with optional filters for category and date range.
-     * Results are sorted by the specified field and direction.
+     * Results are filtered by user and sorted by the specified field and direction.
      * 
      * @param page Zero-based page index
      * @param size Number of records per page
@@ -54,10 +59,11 @@ public class ExpenseService {
      * @param category Optional category filter (null for no filter)
      * @param startDate Optional start date filter (null for no filter)
      * @param endDate Optional end date filter (null for no filter)
+     * @param userId ID of the user whose expenses to retrieve
      * @return PagedResponse containing expense DTOs and pagination metadata
      */
-    public PagedResponse<ExpenseDTO> getExpensesPaginated(int page, int size, String sortBy, String sortDir,
-        Category category, LocalDate startDate, LocalDate endDate) {
+    public PagedResponse<ExpenseDTO> getAllExpensesPaginated(Long userId, int page, int size, String sortBy, 
+        String sortDir, Category category, LocalDate startDate, LocalDate endDate) {
         // Create pageable request with dynamic sorting
         Sort sort = Sort.by(sortBy);
         if ("desc".equalsIgnoreCase(sortDir)) {
@@ -65,22 +71,23 @@ public class ExpenseService {
         }
         Pageable pageable = PageRequest.of(page, size, sort);
 
-        // Apply conditional filtering based on provided parameters
+        // Apply conditional filtering based on provided parameters (user-specific)
         Page<Expense> expensePage;
         
         if (category != null && startDate != null && endDate != null) {
-            // Filter by both category and date range
-            expensePage = expenseRepository.findByCategoryAndDateBetween(
+            // Filter by user, category and date range
+            expensePage = expenseRepository.findByUserIdAndCategoryAndDateBetween(userId, 
                 category, startDate, endDate, pageable);
         } else if (category != null) {
-            // Filter by category only
-            expensePage = expenseRepository.findByCategory(category, pageable);
+            // Filter by user and category only
+            expensePage = expenseRepository.findByUserIdAndCategory(userId, category, pageable);
         } else if (startDate != null && endDate != null) {
-            // Filter by date range only
-            expensePage = expenseRepository.findByDateBetween(startDate, endDate, pageable);
+            // Filter by user and date range only
+            expensePage = expenseRepository.findByUserIdAndDateBetween(userId, startDate, endDate, 
+                pageable);
         } else {
-            // No filters applied - return all expenses
-            expensePage = expenseRepository.findAll(pageable);
+            // No filters applied - return all user expenses
+            expensePage = expenseRepository.findByUserId(userId, pageable);
         }
         
         // Convert entities to DTOs for API response
@@ -102,15 +109,16 @@ public class ExpenseService {
     }
 
     /**
-     * Retrieves a specific expense by its ID.
+     * Retrieves a specific expense by its ID for a specific user.
      * 
      * @param id The unique identifier of the expense
+     * @param userId The ID of the user who owns the expense
      * @return ExpenseDTO containing the expense data
-     * @throws RuntimeException if no expense exists with the given ID
+     * @throws RuntimeException if no expense exists with the given ID for the user
      */
-    public ExpenseDTO getExpenseById(Long id) {
-        // Find expense by ID or throw exception if not found
-        Expense expense = expenseRepository.findById(id)
+    public ExpenseDTO getExpenseById(Long id, Long userId) {
+        // Find expense by ID and user ID or throw exception if not found
+        Expense expense = expenseRepository.findByIdAndUserId(id, userId)
             .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
         
         // Convert entity to DTO
@@ -118,18 +126,26 @@ public class ExpenseService {
     }
 
     /**
-     * Creates a new expense record.
+     * Creates a new expense record for a specific user.
      * 
      * The ID field in the DTO is ignored as the database will auto-generate
      * a unique identifier. Timestamps (createdAt, updatedAt) are automatically
      * set by Hibernate annotations.
      * 
      * @param expenseDTO The expense data to create
+     * @param userId The ID of the user creating the expense
      * @return ExpenseDTO containing the created expense with generated ID
      */
-    public ExpenseDTO createExpense(ExpenseDTO expenseDTO) {
+    public ExpenseDTO createExpense(ExpenseDTO expenseDTO, Long userId) {
+        // Find user or throw exception if not found
+        User user = userRepository.findById(userId)
+            .orElseThrow(() -> new RuntimeException("User not found with id: " + userId));
+        
         // Convert DTO to entity (ID will be null for new records)
         Expense expense = expenseMapper.toEntity(expenseDTO);
+        
+        // Associate expense with user
+        expense.setUser(user);
         
         // Save entity to database (ID and timestamps auto-generated)
         Expense savedExpense = expenseRepository.save(expense);
@@ -139,7 +155,7 @@ public class ExpenseService {
     }
     
     /**
-     * Updates an existing expense record.
+     * Updates an existing expense record for a specific user.
      * 
      * This method performs a partial update, modifying only the provided fields
      * while preserving the original ID and timestamps. The updatedAt timestamp
@@ -147,15 +163,16 @@ public class ExpenseService {
      * 
      * @param id The ID of the expense to update
      * @param expenseDTO The updated expense data
+     * @param userId The ID of the user who owns the expense
      * @return ExpenseDTO containing the updated expense
-     * @throws RuntimeException if no expense exists with the given ID
+     * @throws RuntimeException if no expense exists with the given ID for the user
      */
-    public ExpenseDTO updateExpense(Long id, ExpenseDTO expenseDTO) {
-        // Validate that expense exists before updating
-        Expense existingExpense = expenseRepository.findById(id)
+    public ExpenseDTO updateExpenseById(Long id, ExpenseDTO expenseDTO, Long userId) {
+        // Validate that expense exists and belongs to user before updating
+        Expense existingExpense = expenseRepository.findByIdAndUserId(id, userId)
             .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
         
-        // Update modifiable fields (preserve ID, createdAt)
+        // Update modifiable fields (preserve ID, createdAt, user)
         existingExpense.setDescription(expenseDTO.getDescription());
         existingExpense.setAmount(expenseDTO.getAmount());
         existingExpense.setDate(expenseDTO.getDate());
@@ -169,16 +186,17 @@ public class ExpenseService {
     }
 
     /**
-     * Deletes an expense record by ID.
+     * Deletes an expense record by ID for a specific user.
      * 
      * This method performs a soft validation by checking if the expense exists
-     * before attempting deletion to provide meaningful error messages.
+     * and belongs to the user before attempting deletion to provide meaningful error messages.
      * 
      * @param id The ID of the expense to delete
-     * @throws RuntimeException if no expense exists with the given ID
+     * @param userId The ID of the user who owns the expense
+     * @throws RuntimeException if no expense exists with the given ID for the user
      */
-    public void deleteExpense(Long id) {
-        Expense expense = expenseRepository.findById(id)
+    public void deleteExpenseById(Long id, Long userId) {
+        Expense expense = expenseRepository.findByIdAndUserId(id, userId)
             .orElseThrow(() -> new RuntimeException("Expense not found with id: " + id));
         expenseRepository.delete(expense);
     }

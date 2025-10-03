@@ -2,6 +2,9 @@ package com.suyos.tracker.model;
 
 import java.time.LocalDateTime;
 
+import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -40,7 +43,7 @@ public class User {
      */
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "user_id")
+    @Column(name = "id")
     private Long id;
 
     /**
@@ -50,7 +53,7 @@ public class User {
      * identifier for authentication. Used for password reset
      * and account verification emails.
      */
-    @Column(name = "user_email", nullable = false, unique = true)
+    @Column(name = "email", nullable = false, unique = true)
     private String email;
 
     /**
@@ -68,8 +71,8 @@ public class User {
      * Never stores plain text passwords. Uses BCrypt hashing
      * algorithm for secure password storage and verification.
      */
-    @Column(name = "user_password", nullable = false)
-    private String passwordHash;
+    @Column(name = "password", nullable = false)
+    private String password;
 
     /**
      * Timestamp when the user's password was last changed.
@@ -77,7 +80,7 @@ public class User {
      * Used for password aging policies and security auditing.
      * Helps track when users last updated their credentials.
      */
-    @Column(name = "user_password_changed_at")
+    @Column(name = "password_changed_at")
     private LocalDateTime passwordChangedAt;
 
     /**
@@ -87,7 +90,7 @@ public class User {
      * or administrative requirements. Defaults to false.
      */
     @Builder.Default
-    @Column(name = "user_must_change_password")
+    @Column(name = "must_change_password")
     private Boolean mustChangePassword = false;
 
     /**
@@ -96,7 +99,7 @@ public class User {
      * Required field used for personalization and display purposes
      * throughout the application interface.
      */
-    @Column(name = "user_first_name", nullable = false)
+    @Column(name = "first_name", nullable = false)
     private String firstName;
 
     /**
@@ -105,7 +108,7 @@ public class User {
      * Required field used for personalization and display purposes
      * throughout the application interface.
      */
-    @Column(name = "user_last_name", nullable = false)
+    @Column(name = "last_name", nullable = false)
     private String lastName;
 
     /**
@@ -114,7 +117,7 @@ public class User {
      * Optional field that can be used for two-factor authentication
      * or emergency contact information.
      */
-    @Column(name = "user_phone")
+    @Column(name = "phone")
     private String phone;
 
     /**
@@ -123,7 +126,7 @@ public class User {
      * Optional field storing the location of the user's avatar image
      * for display in the application interface.
      */
-    @Column(name = "user_profile_picture_url")
+    @Column(name = "profile_picture_url")
     private String profilePictureUrl;
 
     /**
@@ -132,7 +135,7 @@ public class User {
      * Disabled accounts cannot log in or access the system.
      * Used for administrative account suspension.
      */
-    @Column(name = "user_account_enabled")
+    @Column(name = "account_enabled")
     private Boolean accountEnabled;
 
     /**
@@ -142,7 +145,7 @@ public class User {
      * their email address through the verification process.
      */
     @Builder.Default
-    @Column(name = "user_email_verified", nullable = false)
+    @Column(name = "email_verified", nullable = false)
     private Boolean emailVerified = false;
 
     /**
@@ -152,7 +155,7 @@ public class User {
      * or expires. Used for security breach prevention.
      */
     @Builder.Default
-    @Column(name = "user_account_locked", nullable = false)
+    @Column(name = "account_locked", nullable = false)
     private Boolean accountLocked = false;
 
     /**
@@ -162,7 +165,7 @@ public class User {
      * lockout when threshold is exceeded. Resets on successful login.
      */
     @Builder.Default
-    @Column(name = "user_failed_login_attempts")
+    @Column(name = "failed_login_attempts")
     private Integer failedLoginAttempts = 0;
 
     /**
@@ -171,7 +174,7 @@ public class User {
      * Null if account is not locked. When this time passes,
      * the account can be automatically unlocked.
      */
-    @Column(name = "user_locked_until")
+    @Column(name = "locked_until")
     private LocalDateTime lockedUntil;
 
     /**
@@ -180,7 +183,7 @@ public class User {
      * Used for security monitoring and user activity tracking.
      * Helps identify inactive accounts and suspicious activity.
      */
-    @Column(name = "user_last_login_at")
+    @Column(name = "last_login_at")
     private LocalDateTime lastLoginAt;
 
     /**
@@ -189,7 +192,7 @@ public class User {
      * Required for legal compliance and tracking user consent
      * to application terms and conditions.
      */
-    @Column(name = "user_terms_accepted_at")
+    @Column(name = "terms_accepted_at")
     private LocalDateTime termsAcceptedAt;
 
     /**
@@ -198,7 +201,7 @@ public class User {
      * Required for GDPR compliance and tracking user consent
      * to data processing and privacy terms.
      */
-    @Column(name = "user_privacy_policy_accepted_at")
+    @Column(name = "privacy_policy_accepted_at")
     private LocalDateTime privacyPolicyAcceptedAt;
 
     /**
@@ -207,7 +210,7 @@ public class User {
      * Used for internationalization to display the application
      * interface in the user's preferred language.
      */
-    @Column(name = "user_locale")
+    @Column(name = "locale")
     private String locale;
 
     /**
@@ -216,7 +219,7 @@ public class User {
      * Used for displaying dates and times in the user's
      * local timezone throughout the application.
      */
-    @Column(name = "user_timezone")
+    @Column(name = "timezone")
     private String timezone;
 
     /**
@@ -225,6 +228,7 @@ public class User {
      * Automatically set when the entity is first persisted.
      * This field is immutable after creation (updatable = false).
      */
+    @CreationTimestamp
     @Column(name = "created_at", updatable = false)
     private LocalDateTime createdAt;
 
@@ -234,6 +238,7 @@ public class User {
      * Automatically updated whenever the entity is saved.
      * Useful for tracking when changes were made to user data.
      */
+    @UpdateTimestamp
     @Column(name = "updated_at")
     private LocalDateTime updatedAt;
 
