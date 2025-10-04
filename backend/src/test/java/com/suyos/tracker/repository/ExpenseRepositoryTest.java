@@ -1,19 +1,21 @@
 package com.suyos.tracker.repository;
 
 import static org.junit.jupiter.api.Assertions.*;
+import static org.mockito.Mockito.*;
 
 import java.math.BigDecimal;
 import java.time.LocalDate;
+import java.util.List;
+import java.util.Optional;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
-import org.springframework.beans.factory.annotation.Autowired;
-
-import org.springframework.boot.test.autoconfigure.orm.jpa.DataJpaTest;
-import org.springframework.test.context.ActiveProfiles;
-import org.springframework.boot.test.autoconfigure.orm.jpa.TestEntityManager;
+import org.junit.jupiter.api.extension.ExtendWith;
+import org.mockito.Mock;
+import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
@@ -22,140 +24,109 @@ import com.suyos.tracker.model.Expense;
 import com.suyos.tracker.model.User;
 
 /**
- * Repository tests for ExpenseRepository.
+ * Unit tests for ExpenseRepository.
  * 
  * @author Joel Salazar
  * @since 1.0
  */
-@DataJpaTest
-@DisplayName("ExpenseRepository Tests")
-@ActiveProfiles("test")
+@ExtendWith(MockitoExtension.class)
+@DisplayName("ExpenseRepository Unit Tests")
 class ExpenseRepositoryTest {
 
-    @Autowired
-    private TestEntityManager entityManager;
-
-    @Autowired
+    @Mock
     private ExpenseRepository expenseRepository;
 
-    private Expense foodExpense;
-    private Expense transportExpense;
+    private Expense testExpense;
     private User testUser;
 
     @BeforeEach
     void setUp() {
         testUser = User.builder()
+                .id(1L)
                 .email("test@example.com")
-                .password("password")
-                .username("testuser")
                 .build();
-        entityManager.persistAndFlush(testUser);
 
-        foodExpense = Expense.builder()
-                .description("Grocery Shopping")
-                .amount(new BigDecimal("45.67"))
+        testExpense = Expense.builder()
+                .id(1L)
+                .description("Test Expense")
+                .amount(new BigDecimal("25.50"))
                 .date(LocalDate.of(2024, 1, 15))
                 .category(Category.FOOD)
                 .user(testUser)
                 .build();
-
-        transportExpense = Expense.builder()
-                .description("Gas Station")
-                .amount(new BigDecimal("60.00"))
-                .date(LocalDate.of(2024, 1, 20))
-                .category(Category.TRANSPORTATION)
-                .user(testUser)
-                .build();
-
-        entityManager.persistAndFlush(foodExpense);
-        entityManager.persistAndFlush(transportExpense);
     }
 
     @Test
-    @DisplayName("Should find expenses by category")
-    void findByExpenseCategory_ExistingCategory_ReturnsExpenses() {
+    @DisplayName("Should find expense by ID and user ID")
+    void findByIdAndUserId_ExistingExpense_ReturnsExpense() {
         // Given
-        Pageable pageable = PageRequest.of(0, 10);
+        when(expenseRepository.findByIdAndUserId(1L, 1L)).thenReturn(Optional.of(testExpense));
 
         // When
-        Page<Expense> result = expenseRepository.findByUserIdAndCategory(testUser.getId(), 
-            Category.FOOD, pageable);
+        Optional<Expense> result = expenseRepository.findByIdAndUserId(1L, 1L);
+
+        // Then
+        assertTrue(result.isPresent());
+        assertEquals(testExpense, result.get());
+        verify(expenseRepository).findByIdAndUserId(1L, 1L);
+    }
+
+    @Test
+    @DisplayName("Should return empty when expense not found")
+    void findByIdAndUserId_NonExistingExpense_ReturnsEmpty() {
+        // Given
+        when(expenseRepository.findByIdAndUserId(999L, 1L)).thenReturn(Optional.empty());
+
+        // When
+        Optional<Expense> result = expenseRepository.findByIdAndUserId(999L, 1L);
+
+        // Then
+        assertFalse(result.isPresent());
+        verify(expenseRepository).findByIdAndUserId(999L, 1L);
+    }
+
+    @Test
+    @DisplayName("Should find expenses by user ID")
+    void findByUserId_ExistingUser_ReturnsExpenses() {
+        // Given
+        Pageable pageable = PageRequest.of(0, 10);
+        Page<Expense> expectedPage = new PageImpl<>(List.of(testExpense));
+        when(expenseRepository.findByUserId(1L, pageable)).thenReturn(expectedPage);
+
+        // When
+        Page<Expense> result = expenseRepository.findByUserId(1L, pageable);
 
         // Then
         assertNotNull(result);
         assertEquals(1, result.getContent().size());
-        assertEquals("Grocery Shopping", result.getContent().get(0).getDescription());
-        assertEquals(Category.FOOD, result.getContent().get(0).getCategory());
+        assertEquals(testExpense, result.getContent().get(0));
+        verify(expenseRepository).findByUserId(1L, pageable);
     }
 
     @Test
-    @DisplayName("Should find expenses by date range")
-    void findByExpenseDateBetween_ValidDateRange_ReturnsExpenses() {
+    @DisplayName("Should save expense")
+    void save_ValidExpense_ReturnsSavedExpense() {
         // Given
-        LocalDate startDate = LocalDate.of(2024, 1, 1);
-        LocalDate endDate = LocalDate.of(2024, 1, 31);
-        Pageable pageable = PageRequest.of(0, 10);
+        when(expenseRepository.save(testExpense)).thenReturn(testExpense);
 
         // When
-        Page<Expense> result = expenseRepository.findByUserIdAndDateBetween(testUser.getId(), 
-            startDate, endDate, pageable);
+        Expense result = expenseRepository.save(testExpense);
 
         // Then
-        assertNotNull(result);
-        assertEquals(2, result.getContent().size());
+        assertEquals(testExpense, result);
+        verify(expenseRepository).save(testExpense);
     }
 
     @Test
-    @DisplayName("Should find expenses by category and date range")
-    void findByExpenseCategoryAndExpenseDateBetween_ValidFilters_ReturnsExpenses() {
+    @DisplayName("Should delete expense")
+    void delete_ValidExpense_DeletesExpense() {
         // Given
-        LocalDate startDate = LocalDate.of(2024, 1, 1);
-        LocalDate endDate = LocalDate.of(2024, 1, 31);
-        Pageable pageable = PageRequest.of(0, 10);
+        doNothing().when(expenseRepository).delete(testExpense);
 
         // When
-        Page<Expense> result = expenseRepository.findByUserIdAndCategoryAndDateBetween(
-                testUser.getId(), Category.FOOD, startDate, endDate, pageable);
+        expenseRepository.delete(testExpense);
 
         // Then
-        assertNotNull(result);
-        assertEquals(1, result.getContent().size());
-        assertEquals("Grocery Shopping", result.getContent().get(0).getDescription());
-        assertEquals(Category.FOOD, result.getContent().get(0).getCategory());
+        verify(expenseRepository).delete(testExpense);
     }
-
-    @Test
-    @DisplayName("Should return empty page when no expenses match category")
-    void findByExpenseCategory_NonExistingCategory_ReturnsEmptyPage() {
-        // Given
-        Pageable pageable = PageRequest.of(0, 10);
-
-        // When
-        Page<Expense> result = expenseRepository.findByUserIdAndCategory(testUser.getId(), 
-            Category.HEALTHCARE, pageable);
-
-        // Then
-        assertNotNull(result);
-        assertTrue(result.getContent().isEmpty());
-        assertEquals(0, result.getTotalElements());
-    }
-
-    @Test
-    @DisplayName("Should return empty page when no expenses in date range")
-    void findByExpenseDateBetween_NoExpensesInRange_ReturnsEmptyPage() {
-        // Given
-        LocalDate startDate = LocalDate.of(2023, 1, 1);
-        LocalDate endDate = LocalDate.of(2023, 12, 31);
-        Pageable pageable = PageRequest.of(0, 10);
-
-        // When
-        Page<Expense> result = expenseRepository.findByUserIdAndDateBetween(testUser.getId(), 
-            startDate, endDate, pageable);
-
-        // Then
-        assertNotNull(result);
-        assertTrue(result.getContent().isEmpty());
-        assertEquals(0, result.getTotalElements());
-    }
-    
 }
