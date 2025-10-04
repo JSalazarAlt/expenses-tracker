@@ -75,7 +75,7 @@ public interface UserRepository extends JpaRepository<User, Long> {
      * @param email The email address to search for
      * @return Optional containing the active user if found, empty otherwise
      */
-    @Query("SELECT u FROM User u WHERE u.email = :email AND u.accountEnabled = true AND u.accountLocked = false AND u.emailVerified = true")
+    @Query("SELECT u FROM User u WHERE u.email = :email AND u.accountEnabled = true AND u.accountLocked = false")
     Optional<User> findActiveUserByEmail(@Param("email") String email);
     
     /**

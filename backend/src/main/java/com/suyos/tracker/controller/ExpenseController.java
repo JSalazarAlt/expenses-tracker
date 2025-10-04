@@ -21,6 +21,12 @@ import com.suyos.tracker.model.Category;
 import com.suyos.tracker.service.ExpenseService;
 import com.suyos.tracker.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -42,6 +48,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 @RequestMapping("/api/expenses")
 @CrossOrigin(origins = "http://localhost:5173") // React dev server
+@Tag(name = "Expenses", description = "Expense management operations")
+@SecurityRequirement(name = "Bearer Authentication")
 public class ExpenseController {
         
     /** Service layer for expense business logic */
@@ -66,14 +74,20 @@ public class ExpenseController {
      * @return ResponseEntity containing paginated expense data and metadata
      */
     @GetMapping
+    @Operation(summary = "Get paginated expenses", description = "Retrieves expenses with pagination, sorting, and filtering for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Successfully retrieved expenses"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token"),
+        @ApiResponse(responseCode = "403", description = "Forbidden - Access denied")
+    })
     public ResponseEntity<PagedResponse<ExpenseDTO>> getAllExpenses(
-            @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size,
-            @RequestParam(defaultValue = "date") String sortBy,
-            @RequestParam(defaultValue = "desc") String sortDir,
-            @RequestParam(required = false) Category category,
-            @RequestParam(required = false) LocalDate startDate,
-            @RequestParam(required = false) LocalDate endDate) {
+            @Parameter(description = "Zero-based page number") @RequestParam(defaultValue = "0") int page,
+            @Parameter(description = "Number of records per page (max 100)") @RequestParam(defaultValue = "10") int size,
+            @Parameter(description = "Field to sort by") @RequestParam(defaultValue = "date") String sortBy,
+            @Parameter(description = "Sort direction (asc/desc)") @RequestParam(defaultValue = "desc") String sortDir,
+            @Parameter(description = "Filter by category") @RequestParam(required = false) Category category,
+            @Parameter(description = "Filter by start date (YYYY-MM-DD)") @RequestParam(required = false) LocalDate startDate,
+            @Parameter(description = "Filter by end date (YYYY-MM-DD)") @RequestParam(required = false) LocalDate endDate) {
         
         // Get current user ID from authentication context
         Long userId = userService.getCurrentUserId();
@@ -96,6 +110,12 @@ public class ExpenseController {
      * @return ResponseEntity containing the created expense with generated ID
      */
     @PostMapping
+    @Operation(summary = "Create new expense", description = "Creates a new expense record for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "Expense created successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token")
+    })
     public ResponseEntity<ExpenseDTO> createExpense(@Valid @RequestBody ExpenseDTO expenseDTO) {
         // Get current user ID from authentication context
         Long userId = userService.getCurrentUserId();
@@ -116,7 +136,13 @@ public class ExpenseController {
      * @return ResponseEntity containing the expense data or 404 if not found
      */
     @GetMapping("/{id}")
-    public ResponseEntity<ExpenseDTO> getExpense(@PathVariable Long id) {
+    @Operation(summary = "Get expense by ID", description = "Retrieves a specific expense by ID for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense found"),
+        @ApiResponse(responseCode = "404", description = "Expense not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token")
+    })
+    public ResponseEntity<ExpenseDTO> getExpense(@Parameter(description = "Expense ID") @PathVariable Long id) {
         try {
             // Get current user ID from authentication context
             Long userId = userService.getCurrentUserId();
@@ -141,7 +167,14 @@ public class ExpenseController {
      * @return ResponseEntity containing the updated expense or 404 if not found
      */
     @PutMapping("/{id}")
-    public ResponseEntity<ExpenseDTO> updateExpense(@PathVariable Long id, @Valid @RequestBody ExpenseDTO expenseDTO) {
+    @Operation(summary = "Update expense", description = "Updates an existing expense record for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Expense updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid input data"),
+        @ApiResponse(responseCode = "404", description = "Expense not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token")
+    })
+    public ResponseEntity<ExpenseDTO> updateExpense(@Parameter(description = "Expense ID") @PathVariable Long id, @Valid @RequestBody ExpenseDTO expenseDTO) {
         try {
             // Get current user ID from authentication context
             Long userId = userService.getCurrentUserId();
@@ -165,7 +198,13 @@ public class ExpenseController {
      * @return ResponseEntity with no content on success or 404 if not found
      */
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteExpense(@PathVariable Long id) {
+    @Operation(summary = "Delete expense", description = "Deletes an expense record by ID for the authenticated user")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "204", description = "Expense deleted successfully"),
+        @ApiResponse(responseCode = "404", description = "Expense not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token")
+    })
+    public ResponseEntity<Void> deleteExpense(@Parameter(description = "Expense ID") @PathVariable Long id) {
         try {
             // Get current user ID from authentication context
             Long userId = userService.getCurrentUserId();

@@ -17,6 +17,12 @@ import com.suyos.tracker.dto.UserRegistrationDTO;
 import com.suyos.tracker.dto.UserUpdateDTO;
 import com.suyos.tracker.service.UserService;
 
+import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
+import io.swagger.v3.oas.annotations.security.SecurityRequirement;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 
@@ -36,6 +42,7 @@ import lombok.RequiredArgsConstructor;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Tag(name = "Users", description = "User authentication and profile management")
 public class UserController {
     
     /** Service layer for user business logic */
@@ -51,6 +58,11 @@ public class UserController {
      * @return ResponseEntity containing the created user's profile or error message
      */
     @PostMapping("/register")
+    @Operation(summary = "Register new user", description = "Creates a new user account with the provided information")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "201", description = "User registered successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid registration data or email already exists")
+    })
     public ResponseEntity<?> registerUser(@Valid @RequestBody UserRegistrationDTO registrationDTO) {
         try {
             UserProfileDTO userProfile = userService.registerUser(registrationDTO);
@@ -71,6 +83,11 @@ public class UserController {
      * @return ResponseEntity containing JWT token and user profile or error message
      */
     @PostMapping("/login")
+    @Operation(summary = "User login", description = "Authenticates user credentials and returns JWT token")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Login successful, JWT token returned"),
+        @ApiResponse(responseCode = "401", description = "Invalid credentials or account locked")
+    })
     public ResponseEntity<?> loginUser(@Valid @RequestBody UserLoginDTO loginDTO) {
         try {
             AuthenticationResponseDTO authResponse = userService.authenticateUser(loginDTO);
@@ -91,7 +108,14 @@ public class UserController {
      * @return ResponseEntity containing the user's profile or error message
      */
     @GetMapping("/{userId}/profile")
-    public ResponseEntity<?> getUserProfile(@PathVariable Long userId) {
+    @Operation(summary = "Get user profile", description = "Retrieves user profile information")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Profile retrieved successfully"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token")
+    })
+    public ResponseEntity<?> getUserProfile(@Parameter(description = "User ID") @PathVariable Long userId) {
         try {
             UserProfileDTO userProfile = userService.getUserProfile(userId);
             return ResponseEntity.ok(userProfile);
@@ -112,7 +136,15 @@ public class UserController {
      * @return ResponseEntity containing the updated user's profile or error message
      */
     @PutMapping("/{userId}/profile")
-    public ResponseEntity<?> updateUserProfile(@PathVariable Long userId, 
+    @Operation(summary = "Update user profile", description = "Updates user profile information (excluding sensitive fields)")
+    @SecurityRequirement(name = "Bearer Authentication")
+    @ApiResponses(value = {
+        @ApiResponse(responseCode = "200", description = "Profile updated successfully"),
+        @ApiResponse(responseCode = "400", description = "Invalid update data"),
+        @ApiResponse(responseCode = "404", description = "User not found"),
+        @ApiResponse(responseCode = "401", description = "Unauthorized - Invalid or missing JWT token")
+    })
+    public ResponseEntity<?> updateUserProfile(@Parameter(description = "User ID") @PathVariable Long userId, 
                                              @Valid @RequestBody UserUpdateDTO updateDTO) {
         try {
             UserProfileDTO updatedProfile = userService.updateUserProfile(userId, updateDTO);
@@ -122,4 +154,5 @@ public class UserController {
                 .body("Profile update failed: " + e.getMessage());
         }
     }
+    
 }

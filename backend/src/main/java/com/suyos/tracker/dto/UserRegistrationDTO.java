@@ -65,7 +65,10 @@ public class UserRegistrationDTO {
      * throughout the application interface.
      */
     @NotBlank(message = "First name is required")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "First name must contain only alphabetic characters")
+    @Pattern(
+        regexp = "^[a-zA-Z ]+$", 
+        message = "First name must contain only alphabetic characters and spaces"
+    )
     private String firstName;
     
     /**
@@ -75,7 +78,10 @@ public class UserRegistrationDTO {
      * and formal communication purposes.
      */
     @NotBlank(message = "Last name is required")
-    @Pattern(regexp = "^[a-zA-Z]+$", message = "Last name must contain only alphabetic characters")
+    @Pattern(
+        regexp = "^[a-zA-Z ]+$", 
+        message = "Last name must contain only alphabetic characters and spaces"
+    )
     private String lastName;
     
     /**
@@ -84,6 +90,10 @@ public class UserRegistrationDTO {
      * Optional field that may be used for account recovery,
      * two-factor authentication, or important notifications.
      */
+    @Pattern(
+        regexp = "^\\+?[0-9]{7,15}$",
+        message = "Phone must be 7 to 15 digits, with optional + for country code"
+    )
     private String phone;
     
     /**

@@ -37,11 +37,16 @@ apiClient.interceptors.response.use(
     (response) => response,
     (error) => {
         if (error.response?.status === 401) {
-            // Clear stored auth data on unauthorized response
-            localStorage.removeItem('token');
-            localStorage.removeItem('user');
-            // Redirect to login or trigger auth state update
-            window.location.reload();
+            // Only reload if this is an authenticated request (has token)
+            // Don't reload during login/register attempts
+            const token = localStorage.getItem('token');
+            if (token) {
+                // Clear stored auth data on unauthorized response
+                localStorage.removeItem('token');
+                localStorage.removeItem('user');
+                // Redirect to login or trigger auth state update
+                window.location.reload();
+            }
         }
         return Promise.reject(error);
     }

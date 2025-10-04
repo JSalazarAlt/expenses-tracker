@@ -42,23 +42,92 @@ function Register({ onRegisterSuccess, onSwitchToLogin }) {
     }
 
     /**
+     * Maps backend error messages to user-friendly messages.
+     */
+    const getErrorMessage = (error) => {
+        const message = error.response?.data || error.message || ''
+        
+        // Handle specific error cases
+        if (message.includes('Email already registered') || message.includes('already exists')) {
+            return 'An account with this email already exists. Please sign in instead or use a different email.'
+        }
+        if (message.includes('Invalid email format')) {
+            return 'Please enter a valid email address (e.g., user@example.com).'
+        }
+        if (message.includes('Password too weak') || message.includes('password requirements')) {
+            return 'Password must be at least 8 characters long and include uppercase, lowercase, number, and special character.'
+        }
+        if (message.includes('Username already taken')) {
+            return 'This username is already taken. Please choose a different one.'
+        }
+        if (message.includes('Invalid username')) {
+            return 'Username must be 3-20 characters long and contain only letters, numbers, and underscores.'
+        }
+        if (error.code === 'NETWORK_ERROR' || message.includes('Network Error')) {
+            return 'Unable to connect to our servers. Please check your internet connection and try again.'
+        }
+        
+        // Default error message
+        return 'Unable to create your account. Please try again or contact support if the problem persists.'
+    }
+
+    /**
      * Validates form data before submission.
      */
     const validateForm = () => {
+        // Email validation
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+        if (!emailRegex.test(formData.email)) {
+            setError('Please enter a valid email address (e.g., user@example.com).')
+            return false
+        }
+        
+        // Password validation
+        if (formData.password.length < 8) {
+            setError('Password must be at least 8 characters long.')
+            return false
+        }
+        
+        // Strong password validation
+        const hasUpperCase = /[A-Z]/.test(formData.password)
+        const hasLowerCase = /[a-z]/.test(formData.password)
+        const hasNumbers = /\d/.test(formData.password)
+        const hasSpecialChar = /[!@#$%^&*(),.?":{}|<>]/.test(formData.password)
+        
+        if (!hasUpperCase || !hasLowerCase || !hasNumbers || !hasSpecialChar) {
+            setError('Password must include uppercase letter, lowercase letter, number, and special character.')
+            return false
+        }
+        
         if (formData.password !== formData.confirmPassword) {
-            setError('Passwords do not match')
+            setError('Passwords do not match. Please make sure both passwords are identical.')
             return false
         }
-        if (formData.password.length < 6) {
-            setError('Password must be at least 6 characters long')
+        
+        // Username validation
+        const usernameRegex = /^[a-zA-Z0-9_]{3,20}$/
+        if (!usernameRegex.test(formData.username)) {
+            setError('Username must be 3-20 characters long and contain only letters, numbers, and underscores.')
             return false
         }
+        
+        // Name validation
+        if (formData.firstName.trim().length < 2) {
+            setError('First name must be at least 2 characters long.')
+            return false
+        }
+        
+        if (formData.lastName.trim().length < 2) {
+            setError('Last name must be at least 2 characters long.')
+            return false
+        }
+        
         if (!formData.termsAccepted) {
-            setError('You must accept the terms of service')
+            setError('Please accept the Terms of Service to continue.')
             return false
         }
         if (!formData.privacyPolicyAccepted) {
-            setError('You must accept the privacy policy')
+            setError('Please accept the Privacy Policy to continue.')
             return false
         }
         return true
@@ -99,7 +168,7 @@ function Register({ onRegisterSuccess, onSwitchToLogin }) {
             onRegisterSuccess(loginResponse.user)
         } catch (error) {
             console.error('Registration error:', error)
-            setError(error.response?.data || 'Registration failed. Please try again.')
+            setError(getErrorMessage(error))
         } finally {
             setLoading(false)
         }
@@ -217,7 +286,6 @@ function Register({ onRegisterSuccess, onSwitchToLogin }) {
                             required
                             disabled={loading}
                         />
-                        <span className="checkmark"></span>
                         I accept the Terms of Service
                     </label>
                 </div>
@@ -232,7 +300,6 @@ function Register({ onRegisterSuccess, onSwitchToLogin }) {
                             required
                             disabled={loading}
                         />
-                        <span className="checkmark"></span>
                         I accept the Privacy Policy
                     </label>
                 </div>

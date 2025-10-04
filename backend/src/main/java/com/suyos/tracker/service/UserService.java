@@ -112,6 +112,10 @@ public class UserService {
             throw new RuntimeException("Account is locked. Try again later.");
         }
         
+        // Note: Email verification is not required for login (industry standard)
+        // Users can login immediately after registration
+        // Verification can be prompted for sensitive actions if needed
+        
         // Validate password
         if (!passwordEncoder.matches(userLoginDTO.getPassword(), user.getPassword())) {
             handleFailedLogin(user);

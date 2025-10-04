@@ -1,0 +1,15 @@
+2025-10-03 20:21:53.806 [restartedMain] ERROR o.s.b.d.LoggingFailureAnalysisReporter - 
+
+***************************
+APPLICATION FAILED TO START
+***************************
+
+Description:
+
+Parameter 2 of constructor in com.suyos.tracker.service.ExpenseService required a bean of type 'com.suyos.tracker.mapper.ExpenseMapper' that could not be found.
+
+
+Action:
+
+Consider defining a bean of type 'com.suyos.tracker.mapper.ExpenseMapper' in your configuration.
+

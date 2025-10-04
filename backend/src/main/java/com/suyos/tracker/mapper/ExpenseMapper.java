@@ -36,6 +36,7 @@ public interface ExpenseMapper {
      */
     @Mapping(target = "createdAt", ignore = true)
     @Mapping(target = "updatedAt", ignore = true)
+    @Mapping(target = "user", ignore = true)
     Expense toEntity(ExpenseDTO expenseDTO);
 
     /**
