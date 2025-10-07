@@ -28,16 +28,6 @@ import lombok.NoArgsConstructor;
 public class UserRegistrationDTO {
     
     /**
-     * User's email address for account creation and login.
-     * 
-     * Must be a valid email format and will be used as the primary
-     * identifier for authentication and communication.
-     */
-    @NotBlank(message = "Email is required")
-    @Email(message = "Invalid email format")
-    private String email;
-    
-    /**
      * User's chosen username for display purposes.
      * 
      * Must be unique across the system and between 3-20 characters.
@@ -47,16 +37,6 @@ public class UserRegistrationDTO {
     @Size(min = 3, max = 20, message = "Username must be 3-20 characters")
     @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must contain only alphanumeric characters")
     private String username;
-    
-    /**
-     * User's password for account security.
-     * 
-     * Must be at least 8 characters long for security purposes.
-     * Will be hashed before storage in the database.
-     */
-    @NotBlank(message = "Password is required")
-    @Size(min = 8, message = "Password must be at least 8 characters")
-    private String password;
     
     /**
      * User's first name for personalization.
@@ -84,6 +64,26 @@ public class UserRegistrationDTO {
     )
     private String lastName;
     
+    /**
+     * User's email address for account creation and login.
+     * 
+     * Must be a valid email format and will be used as the primary
+     * identifier for authentication and communication.
+     */
+    @NotBlank(message = "Email is required")
+    @Email(message = "Invalid email format")
+    private String email;
+    
+    /**
+     * User's password for account security.
+     * 
+     * Must be at least 8 characters long for security purposes.
+     * Will be hashed before storage in the database.
+     */
+    @NotBlank(message = "Password is required")
+    @Size(min = 8, message = "Password must be at least 8 characters")
+    private String password;
+
     /**
      * User's phone number for contact purposes.
      * 
