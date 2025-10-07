@@ -32,13 +32,6 @@ public class UserProfileDTO {
     private Long id;
 
     /**
-     * User's email address.
-     * 
-     * Primary contact method and login identifier for the user account.
-     */
-    private String email;
-
-    /**
      * User's chosen username for display purposes.
      * 
      * Unique identifier that can be shown publicly in the application interface.
@@ -58,6 +51,13 @@ public class UserProfileDTO {
      * Combined with first name for full user identification in the interface.
      */
     private String lastName;
+
+    /**
+     * User's email address.
+     * 
+     * Primary contact method and login identifier for the user account.
+     */
+    private String email;
 
     /**
      * User's phone number for contact purposes.
