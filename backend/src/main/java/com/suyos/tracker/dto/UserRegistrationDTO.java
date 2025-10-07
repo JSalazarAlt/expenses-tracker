@@ -35,7 +35,10 @@ public class UserRegistrationDTO {
      */
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 20, message = "Username must be 3-20 characters")
-    @Pattern(regexp = "^[a-zA-Z0-9]+$", message = "Username must contain only alphanumeric characters")
+    @Pattern(
+        regexp = "^[a-zA-Z0-9]+$", 
+        message = "Username must contain only alphanumeric characters"
+    )
     private String username;
     
     /**
