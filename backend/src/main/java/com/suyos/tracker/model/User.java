@@ -33,7 +33,6 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @Builder
 public class User {
-    
 
     /**
      * Unique identifier for the user record.
@@ -47,16 +46,6 @@ public class User {
     private Long id;
 
     /**
-     * User's email address used for login and communication.
-     * 
-     * Must be unique across all users and serves as the primary
-     * identifier for authentication. Used for password reset
-     * and account verification emails.
-     */
-    @Column(name = "email", nullable = false, unique = true)
-    private String email;
-
-    /**
      * User's chosen username for display purposes.
      * 
      * Must be unique across all users. Optional alternative
@@ -64,35 +53,7 @@ public class User {
      */
     @Column(name = "username", nullable = false, unique = true)
     private String username;
-
-    /**
-     * Encrypted password hash for user authentication.
-     * 
-     * Never stores plain text passwords. Uses BCrypt hashing
-     * algorithm for secure password storage and verification.
-     */
-    @Column(name = "password", nullable = false)
-    private String password;
-
-    /**
-     * Timestamp when the user's password was last changed.
-     * 
-     * Used for password aging policies and security auditing.
-     * Helps track when users last updated their credentials.
-     */
-    @Column(name = "password_changed_at")
-    private LocalDateTime passwordChangedAt;
-
-    /**
-     * Flag indicating if user must change password on next login.
-     * 
-     * Used for forced password resets due to security policies
-     * or administrative requirements. Defaults to false.
-     */
-    @Builder.Default
-    @Column(name = "must_change_password")
-    private Boolean mustChangePassword = false;
-
+    
     /**
      * User's first name for personal identification.
      * 
@@ -110,6 +71,54 @@ public class User {
      */
     @Column(name = "last_name", nullable = false)
     private String lastName;
+
+    /**
+     * User's email address used for login and communication.
+     * 
+     * Must be unique across all users and serves as the primary
+     * identifier for authentication. Used for password reset
+     * and account verification emails.
+     */
+    @Column(name = "email", nullable = false, unique = true)
+    private String email;
+    
+    /**
+     * Flag indicating if the user's email address has been verified.
+     * 
+     * Unverified users may have limited access until they confirm
+     * their email address through the verification process.
+     */
+    @Builder.Default
+    @Column(name = "email_verified", nullable = false)
+    private Boolean emailVerified = false;
+
+    /**
+     * Encrypted password hash for user authentication.
+     * 
+     * Never stores plain text passwords. Uses BCrypt hashing
+     * algorithm for secure password storage and verification.
+     */
+    @Column(name = "password", nullable = false)
+    private String password;
+
+    /**
+     * Flag indicating if user must change password on next login.
+     * 
+     * Used for forced password resets due to security policies
+     * or administrative requirements. Defaults to false.
+     */
+    @Builder.Default
+    @Column(name = "must_change_password")
+    private Boolean mustChangePassword = false;
+
+    /**
+     * Timestamp when the user's password was last changed.
+     * 
+     * Used for password aging policies and security auditing.
+     * Helps track when users last updated their credentials.
+     */
+    @Column(name = "password_changed_at")
+    private LocalDateTime passwordChangedAt;
 
     /**
      * User's phone number for contact purposes.
@@ -130,61 +139,22 @@ public class User {
     private String profilePictureUrl;
 
     /**
-     * Flag indicating if the user account is enabled.
+     * User's preferred language locale.
      * 
-     * Disabled accounts cannot log in or access the system.
-     * Used for administrative account suspension.
+     * Used for internationalization to display the application
+     * interface in the user's preferred language.
      */
-    @Column(name = "account_enabled")
-    private Boolean accountEnabled;
+    @Column(name = "locale")
+    private String locale;
 
     /**
-     * Flag indicating if the user's email address has been verified.
+     * User's timezone preference.
      * 
-     * Unverified users may have limited access until they confirm
-     * their email address through the verification process.
+     * Used for displaying dates and times in the user's
+     * local timezone throughout the application.
      */
-    @Builder.Default
-    @Column(name = "email_verified", nullable = false)
-    private Boolean emailVerified = false;
-
-    /**
-     * Flag indicating if the user account is temporarily locked.
-     * 
-     * Locked accounts cannot log in until the lock is removed
-     * or expires. Used for security breach prevention.
-     */
-    @Builder.Default
-    @Column(name = "account_locked", nullable = false)
-    private Boolean accountLocked = false;
-
-    /**
-     * Counter for consecutive failed login attempts.
-     * 
-     * Used to track security violations and trigger account
-     * lockout when threshold is exceeded. Resets on successful login.
-     */
-    @Builder.Default
-    @Column(name = "failed_login_attempts")
-    private Integer failedLoginAttempts = 0;
-
-    /**
-     * Timestamp when the account lock expires.
-     * 
-     * Null if account is not locked. When this time passes,
-     * the account can be automatically unlocked.
-     */
-    @Column(name = "locked_until")
-    private LocalDateTime lockedUntil;
-
-    /**
-     * Timestamp of the user's last successful login.
-     * 
-     * Used for security monitoring and user activity tracking.
-     * Helps identify inactive accounts and suspicious activity.
-     */
-    @Column(name = "last_login_at")
-    private LocalDateTime lastLoginAt;
+    @Column(name = "timezone")
+    private String timezone;
 
     /**
      * Timestamp when the user accepted the terms of service.
@@ -205,22 +175,51 @@ public class User {
     private LocalDateTime privacyPolicyAcceptedAt;
 
     /**
-     * User's preferred language locale.
+     * Flag indicating if the user account is enabled.
      * 
-     * Used for internationalization to display the application
-     * interface in the user's preferred language.
+     * Disabled accounts cannot log in or access the system.
+     * Used for administrative account suspension.
      */
-    @Column(name = "locale")
-    private String locale;
+    @Column(name = "account_enabled")
+    private Boolean accountEnabled;
 
     /**
-     * User's timezone preference.
+     * Flag indicating if the user account is temporarily locked.
      * 
-     * Used for displaying dates and times in the user's
-     * local timezone throughout the application.
+     * Locked accounts cannot log in until the lock is removed
+     * or expires. Used for security breach prevention.
      */
-    @Column(name = "timezone")
-    private String timezone;
+    @Builder.Default
+    @Column(name = "account_locked", nullable = false)
+    private Boolean accountLocked = false;
+
+    /**
+     * Timestamp when the account lock expires.
+     * 
+     * Null if account is not locked. When this time passes,
+     * the account can be automatically unlocked.
+     */
+    @Column(name = "locked_until")
+    private LocalDateTime lockedUntil;
+
+    /**
+     * Timestamp of the user's last successful login.
+     * 
+     * Used for security monitoring and user activity tracking.
+     * Helps identify inactive accounts and suspicious activity.
+     */
+    @Column(name = "last_login_at")
+    private LocalDateTime lastLoginAt;
+
+    /**
+     * Counter for consecutive failed login attempts.
+     * 
+     * Used to track security violations and trigger account
+     * lockout when threshold is exceeded. Resets on successful login.
+     */
+    @Builder.Default
+    @Column(name = "failed_login_attempts")
+    private Integer failedLoginAttempts = 0;
 
     /**
      * Timestamp when the user record was first created in the system.

@@ -64,17 +64,17 @@ public class UserService {
      * @return the created user's profile information
      * @throws RuntimeException if email already exists
      */
-    public UserProfileDTO registerUser(UserRegistrationDTO registrationDTO) {
+    public UserProfileDTO registerUser(UserRegistrationDTO userRegistrationDTO) {
         // Check if email already exists
-        if (userRepository.existsByEmail(registrationDTO.getEmail())) {
+        if (userRepository.existsByEmail(userRegistrationDTO.getEmail())) {
             throw new RuntimeException("Email already registered");
         }
         
         // Convert DTO to entity
-        User user = userMapper.toEntity(registrationDTO);
+        User user = userMapper.toEntity(userRegistrationDTO);
         
         // Set security fields
-        user.setPassword(passwordEncoder.encode(registrationDTO.getPassword()));
+        user.setPassword(passwordEncoder.encode(userRegistrationDTO.getPassword()));
         user.setAccountEnabled(true);
         user.setEmailVerified(false);
         user.setFailedLoginAttempts(0);

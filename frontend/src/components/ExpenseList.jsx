@@ -49,6 +49,10 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
     
     /** Filter by end date */
     const [filterEndDate, setFilterEndDate] = useState(null);
+    
+    /** Confirmation modal state */
+    const [showConfirmModal, setShowConfirmModal] = useState(false);
+    const [expenseToDelete, setExpenseToDelete] = useState(null);
 
     /**
      * Effect hook to fetch expense data when pagination or filters change.
@@ -93,17 +97,25 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
 
 
     /**
-     * Handles expense deletion and updates local state.
+     * Shows confirmation modal for expense deletion.
      * 
      * @param {number} id - The ID of the expense to delete
      */
-    const handleDelete = async (id) => {
+    const handleDeleteClick = (id) => {
+        setExpenseToDelete(id);
+        setShowConfirmModal(true);
+    };
+
+    /**
+     * Confirms and executes expense deletion.
+     */
+    const confirmDelete = async () => {
         try {
             // Delete expense via API
-            await expenseAPI.delete(id);
+            await expenseAPI.delete(expenseToDelete);
             
             // Update local state instead of refetching
-            setData(prev => prev.filter(expense => expense.id !== id));
+            setData(prev => prev.filter(expense => expense.id !== expenseToDelete));
             setTotalElements(prev => prev - 1);
             
             // Recalculate total pages
@@ -117,7 +129,18 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
             }
         } catch (err) {
             setError(err);
+        } finally {
+            setShowConfirmModal(false);
+            setExpenseToDelete(null);
         }
+    };
+
+    /**
+     * Cancels expense deletion.
+     */
+    const cancelDelete = () => {
+        setShowConfirmModal(false);
+        setExpenseToDelete(null);
     };
 
     return (
@@ -234,7 +257,7 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                             <td className="date">{expense.date}</td>
                             <td className="actions">
                                 <button className="btn-edit" onClick={() => onEditExpense(expense)}>✏️ Edit</button>
-                                <button className="btn-delete" onClick={() => handleDelete(expense.id)}>🗑️ Delete</button>
+                                <button className="btn-delete" onClick={() => handleDeleteClick(expense.id)}>🗑️ Delete</button>
                             </td>
                         </tr>
                     ))}
@@ -256,6 +279,19 @@ function ExpenseList({ onAddExpense, onEditExpense }) {
                     Next
                 </button>
             </div>
+
+            {showConfirmModal && (
+                <div className="modal-overlay">
+                    <div className="modal-content">
+                        <h3>Confirm Delete</h3>
+                        <p>Are you sure you want to delete this expense? This action cannot be undone.</p>
+                        <div className="modal-actions">
+                            <button className="btn-cancel" onClick={cancelDelete}>Cancel</button>
+                            <button className="btn-confirm" onClick={confirmDelete}>Delete</button>
+                        </div>
+                    </div>
+                </div>
+            )}
         </div>
     );
 };
